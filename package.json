@@ -1,0 +1,36 @@
+{
+  "name": "stocks-rank",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "dev:demo": "STOCKS_RANK_DATA=demo next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "check": "npm run lint && npm run typecheck && npm run test",
+    "universe": "node scripts/build-universe.mjs"
+  },
+  "dependencies": {
+    "next": "16.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1",
+    "yahoo-finance2": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.0",
+    "typescript": "^5",
+    "vitest": "^5.0.4"
+  },
+  "description": "Rank S&P 500 and Nasdaq-100 stocks on 13 metrics, shown as a radar chart",
+  "engines": {
+    "node": ">=22"
+  }
+}
