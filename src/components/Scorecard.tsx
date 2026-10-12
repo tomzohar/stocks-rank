@@ -72,6 +72,8 @@ export function Scorecard({
         </div>
       </header>
 
+      <AnalysisBanner analysis={analysis} />
+
       <div className="scorecard-grid">
         <section className="panel">
           <div className="total">
@@ -171,21 +173,45 @@ function Rationale({ analysis, id }: { analysis: AnalysisState; id: QualitativeM
 }
 
 /** Who scored metrics 8–13, Claude's summary, and its sources. */
+/** Says loudly what's happening with metrics 8–13 until Claude's scores are in. */
+function AnalysisBanner({ analysis }: { analysis: AnalysisState }) {
+  switch (analysis.status) {
+    case "ready":
+      return null;
+    case "pending":
+      return (
+        <div className="banner banner-pending" role="status">
+          <span className="spinner" aria-hidden="true" />
+          <span>
+            <strong>Claude is scoring metrics 8–13.</strong> It&apos;s researching the company on the web, which takes
+            about a minute the first time. Scores fill in here when it&apos;s done.
+          </span>
+        </div>
+      );
+    case "unavailable":
+      return (
+        <div className="banner banner-off" role="status">
+          <span className="banner-icon" aria-hidden="true">!</span>
+          <span>
+            <strong>Claude scoring is off.</strong> {analysis.reason}
+          </span>
+        </div>
+      );
+    case "error":
+      return (
+        <div className="banner banner-error" role="alert">
+          <span className="banner-icon" aria-hidden="true">×</span>
+          <span>
+            <strong>Claude couldn&apos;t score metrics 8–13.</strong> {analysis.message}
+          </span>
+        </div>
+      );
+  }
+}
+
+/** Claude's summary, who scored it, and its sources — once the scores are in. */
 function AnalysisPanel({ analysis }: { analysis: AnalysisState }) {
-  if (analysis.status === "pending") {
-    return (
-      <div className="analysis" role="status">
-        <p className="muted">Claude is researching the company to score metrics 8–13. This can take a minute.</p>
-      </div>
-    );
-  }
-  if (analysis.status !== "ready") {
-    return (
-      <div className="analysis" role={analysis.status === "error" ? "alert" : undefined}>
-        <p className="muted">{analysis.status === "error" ? analysis.message : analysis.reason}</p>
-      </div>
-    );
-  }
+  if (analysis.status !== "ready") return null;
   const a = analysis.analysis;
   const when = new Date(a.analyzedAt).toLocaleDateString("en-US", { dateStyle: "medium" });
   return (

@@ -2,6 +2,7 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { analyzeWithClaude } from "./claude";
 import { demoAnalysis } from "./demo";
+import { describeAnalysisError } from "./errors";
 import { ANALYSIS_VERSION } from "./prompt";
 import { INDEX_LABELS, type Stock } from "../universe";
 import type { AnalysisState, AnalysisSubject } from "./types";
@@ -24,13 +25,16 @@ export async function getAnalysis(subject: AnalysisSubject): Promise<AnalysisSta
   }
   // Checked outside the cache so a missing key is never cached.
   if (!process.env.ANTHROPIC_API_KEY) {
-    return { status: "unavailable", reason: "Set ANTHROPIC_API_KEY to have Claude score these metrics." };
+    return {
+      status: "unavailable",
+      reason: "This deployment has no ANTHROPIC_API_KEY. Add it in the hosting settings and redeploy.",
+    };
   }
   try {
     return { status: "ready", analysis: await cachedAnalysis(subject) };
   } catch (err) {
     console.error(`Claude analysis for ${subject.symbol} failed:`, err);
-    return { status: "error", message: "Claude's analysis failed. Reload to try again." };
+    return { status: "error", message: describeAnalysisError(err) };
   }
 }
 
