@@ -8,6 +8,8 @@ export interface RadarAxis {
   label: string;
   kind: "quantitative" | "qualitative";
   score: Score | null;
+  /** Still being scored — labelled "…" rather than "n/a". */
+  pending?: boolean;
 }
 
 // Wide side margins leave room for the axis labels, which sit outside the rings.
@@ -110,7 +112,7 @@ export function RadarChart({
             >
               {a.label}
               <tspan className="radar-label-score" dx="0.4em">
-                {a.score ?? "n/a"}
+                {a.pending ? "…" : (a.score ?? "n/a")}
               </tspan>
             </text>
           );
@@ -128,7 +130,7 @@ export function RadarChart({
               x2={p.x}
               y2={p.y}
               tabIndex={0}
-              aria-label={`${a.label}: ${a.score ?? "not scored"}`}
+              aria-label={`${a.label}: ${a.pending ? "being scored" : (a.score ?? "not scored")}`}
               onMouseEnter={() => onHighlight(a.id)}
               onMouseLeave={() => onHighlight(null)}
               onFocus={() => onHighlight(a.id)}
@@ -148,7 +150,7 @@ export function RadarChart({
           <svg width="22" height="8" aria-hidden="true">
             <line x1="0" y1="4" x2="22" y2="4" className="radar-spoke qualitative" />
           </svg>
-          Your judgement
+          Scored by Claude
         </span>
       </div>
     </div>

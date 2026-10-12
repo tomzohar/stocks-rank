@@ -548,3 +548,53 @@ h2 {
   font-size: 0.8rem;
   font-weight: 600;
 }
+
+/* Claude analysis */
+.rationale {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.skeleton-text {
+  display: block;
+  height: 0.8rem;
+  width: 85%;
+  margin-top: 0.3rem;
+  border-radius: 4px;
+  background: var(--border);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.badge.is-pending::before {
+  display: none;
+}
+.analysis {
+  border-top: 1px solid var(--border);
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  font-size: 0.9rem;
+}
+.analysis p {
+  margin: 0 0 0.5rem;
+}
+.analysis-meta {
+  font-size: 0.78rem;
+}
+.sources summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.sources ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.82rem;
+}
+.sources li {
+  margin: 0.2rem 0;
+  overflow-wrap: anywhere;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-text {
+    animation: none;
+  }
+}

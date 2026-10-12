@@ -1,6 +1,6 @@
 // The 13 metrics a stock is ranked on. Every metric scores 0, 5 or 10, so a
 // stock's maximum is 130. Metrics 1-7 are computed from market data; 8-13 are
-// judgement calls the user enters themselves.
+// judgement calls that Claude scores (see lib/analysis).
 
 export type Score = 0 | 5 | 10;
 export const SCORE_VALUES: readonly Score[] = [0, 5, 10];
@@ -98,22 +98,21 @@ export const METRICS: readonly MetricDefinition[] = [
       10: "20 pts or more above",
     },
   },
-  qualitative("moat", "Moat", "Moat"),
-  qualitative("ceo", "CEO", "CEO"),
-  qualitative("recessionProof", "Recession proof", "Recession"),
-  qualitative("secularTrend", "Secular trend", "Trend"),
-  qualitative("culture", "Culture / mission", "Culture"),
-  qualitative("talent", "Talent", "Talent"),
+  qualitative("moat", "Moat", "Moat", ["Little or none", "Real but contestable", "Wide and durable"]),
+  qualitative("ceo", "CEO", "CEO", ["Poor record or turmoil", "Competent or unproven", "Proven and exceptional"]),
+  qualitative("recessionProof", "Recession proof", "Recession", ["Highly cyclical", "Moderately cyclical", "Resilient"]),
+  qualitative("secularTrend", "Secular trend", "Trend", ["Structural decline", "Neutral or mixed", "Strong tailwind"]),
+  qualitative("culture", "Culture / mission", "Culture", ["Toxic or scandal-ridden", "Unremarkable", "Strong and distinctive"]),
+  qualitative("talent", "Talent", "Talent", ["Can't hire or retain", "Average", "Destination employer"]),
 ];
 
-function qualitative(id: QualitativeMetricId, label: string, axisLabel: string): MetricDefinition {
-  return {
-    id,
-    label,
-    axisLabel,
-    kind: "qualitative",
-    criteria: { 0: "Weak", 5: "Average", 10: "Strong" },
-  };
+function qualitative(
+  id: QualitativeMetricId,
+  label: string,
+  axisLabel: string,
+  [low, mid, high]: [string, string, string],
+): MetricDefinition {
+  return { id, label, axisLabel, kind: "qualitative", criteria: { 0: low, 5: mid, 10: high } };
 }
 
 export const MAX_TOTAL_SCORE = METRICS.length * MAX_METRIC_SCORE;

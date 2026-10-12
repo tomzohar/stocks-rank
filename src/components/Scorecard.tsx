@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useState } from "react";
+import type { AnalysisState } from "@/lib/analysis/types";
 import type { StockFundamentals } from "@/lib/data/fundamentals";
 import { formatMoney, formatPercent, formatPoints, formatPrice } from "@/lib/format";
-import { getRaw, parseQualitative, setScore, subscribe } from "@/lib/qualitative-store";
 import {
   MAX_TOTAL_SCORE,
   METRICS,
+  QUALITATIVE_METRIC_IDS,
   SCORE_VALUES,
   type MetricDefinition,
   type MetricId,
@@ -22,22 +23,30 @@ export function Scorecard({
   stock,
   fundamentals: f,
   scores: quantitative,
+  analysis,
 }: {
   stock: Stock;
   fundamentals: StockFundamentals;
   scores: Record<QuantitativeMetricId, Score | null>;
+  analysis: AnalysisState;
 }) {
-  const raw = useSyncExternalStore(
-    subscribe,
-    () => getRaw(stock.symbol),
-    () => null,
-  );
-  const qualitative = useMemo(() => parseQualitative(raw), [raw]);
   const [highlighted, setHighlighted] = useState<MetricId | null>(null);
+
+  const assessed = analysis.status === "ready" ? analysis.analysis.metrics : null;
+  const qualitative = Object.fromEntries(
+    QUALITATIVE_METRIC_IDS.map((id) => [id, assessed?.[id].score ?? null]),
+  ) as Record<QualitativeMetricId, Score | null>;
+  const pending = analysis.status === "pending";
 
   const scores: Scores = { ...quantitative, ...qualitative };
   const total = totalScore(scores);
-  const axes = METRICS.map((m) => ({ id: m.id, label: m.label, kind: m.kind, score: scores[m.id] ?? null }));
+  const axes = METRICS.map((m) => ({
+    id: m.id,
+    label: m.label,
+    kind: m.kind,
+    score: scores[m.id] ?? null,
+    pending: pending && m.kind === "qualitative",
+  }));
   // The radar has room for short labels only.
   const radarAxes = axes.map((a, i) => ({ ...a, label: METRICS[i].axisLabel }));
 
@@ -71,9 +80,11 @@ export function Scorecard({
             <span className="muted total-note">
               {total.scoredCount} of {METRICS.length} metrics scored
               {total.ratio !== null && ` · ${Math.round(total.ratio * 100)}% of the points available on those`}
+              {pending && " · Claude is scoring the rest"}
             </span>
           </div>
           <RadarChart axes={radarAxes} highlighted={highlighted} onHighlight={setHighlighted} />
+          <AnalysisPanel analysis={analysis} />
         </section>
 
         <section className="panel">
@@ -104,23 +115,24 @@ export function Scorecard({
                     {m.kind === "quantitative" ? (
                       <Statistic id={m.id as QuantitativeMetricId} f={f} />
                     ) : (
-                      <ScoreInput
-                        label={m.label}
-                        value={qualitative[m.id as QualitativeMetricId] ?? null}
-                        onChange={(s) => setScore(stock.symbol, m.id as QualitativeMetricId, s)}
-                      />
+                      <Rationale analysis={analysis} id={m.id as QualitativeMetricId} />
                     )}
                   </td>
                   <td className="num">
-                    <ScoreBadge score={scores[m.id] ?? null} />
+                    {pending && m.kind === "qualitative" ? (
+                      <span className="badge tone-none is-pending">…</span>
+                    ) : (
+                      <ScoreBadge score={scores[m.id] ?? null} />
+                    )}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
           <p className="muted footnote">
-            Scores for metrics 8–13 are saved in this browser only. Growth and scalability compare the last two fiscal
-            years; the 5-year comparison uses dividend-adjusted prices against SPY.
+            Metrics 8–13 are judgement calls scored by Claude after researching the company on the web; treat them as an
+            informed opinion. Growth and scalability compare the last two fiscal years; the 5-year comparison uses
+            dividend-adjusted prices against SPY.
           </p>
         </section>
       </div>
@@ -146,30 +158,75 @@ function ScoreBadge({ score }: { score: Score | null }) {
   );
 }
 
-function ScoreInput({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: Score | null;
-  onChange: (s: Score | null) => void;
-}) {
+function Rationale({ analysis, id }: { analysis: AnalysisState; id: QualitativeMetricId }) {
+  switch (analysis.status) {
+    case "pending":
+      return <span className="skeleton-text" aria-label="Claude is analyzing" />;
+    case "ready":
+      return <span className="rationale">{analysis.analysis.metrics[id].rationale}</span>;
+    case "unavailable":
+    case "error":
+      return <span className="stat-sub">Not scored</span>;
+  }
+}
+
+/** Who scored metrics 8–13, Claude's summary, and its sources. */
+function AnalysisPanel({ analysis }: { analysis: AnalysisState }) {
+  if (analysis.status === "pending") {
+    return (
+      <div className="analysis" role="status">
+        <p className="muted">Claude is researching the company to score metrics 8–13. This can take a minute.</p>
+      </div>
+    );
+  }
+  if (analysis.status !== "ready") {
+    return (
+      <div className="analysis" role={analysis.status === "error" ? "alert" : undefined}>
+        <p className="muted">{analysis.status === "error" ? analysis.message : analysis.reason}</p>
+      </div>
+    );
+  }
+  const a = analysis.analysis;
+  const when = new Date(a.analyzedAt).toLocaleDateString("en-US", { dateStyle: "medium" });
   return (
-    <div className="score-input" role="group" aria-label={`${label} score`}>
-      {SCORE_VALUES.map((s) => (
-        <button
-          key={s}
-          type="button"
-          aria-pressed={value === s}
-          onClick={() => onChange(value === s ? null : s)}
-          title={value === s ? "Click again to clear" : undefined}
-        >
-          {s}
-        </button>
-      ))}
+    <div className="analysis">
+      <h2>{a.source === "demo" ? "Demo analysis" : "Claude's take"}</h2>
+      <p>{a.summary}</p>
+      <p className="muted analysis-meta">
+        {a.source === "demo" ? "Generated offline, not real" : `Scored by ${modelLabel(a.model)} on ${when}`}
+      </p>
+      {a.sources.length > 0 && (
+        <details className="sources">
+          <summary>Sources ({a.sources.length})</summary>
+          <ul>
+            {a.sources.map((src) => (
+              <li key={src.url}>
+                <a href={src.url} target="_blank" rel="noopener noreferrer">
+                  {src.title}
+                </a>{" "}
+                <span className="muted">{hostname(src.url)}</span>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
     </div>
   );
+}
+
+const MODEL_NAMES: Record<string, string> = {
+  "claude-opus-5-5": "Claude Opus 5.5",
+  "claude-opus-5": "Claude Opus 5",
+  "claude-opus-4-8": "Claude Opus 4.8",
+};
+const modelLabel = (id: string) => MODEL_NAMES[id] ?? id;
+
+function hostname(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
 }
 
 function Statistic({ id, f }: { id: QuantitativeMetricId; f: StockFundamentals }) {
