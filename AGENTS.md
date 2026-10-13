@@ -7,3 +7,25 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## stocks-rank
+
+Read `README.md` first: it covers the metrics and their edge cases, how Claude
+scores (and where the API key may and may not go), the PWA and update flow,
+and the architecture.
+
+- **Checks:** `npm run check` (lint, typecheck, unit tests) and `npm run build`
+  before pushing. `npm run dev:demo` runs fully offline with labelled fake data.
+- **Boundaries:** routes in `src/app/` compose features; `src/features/<name>/`
+  own their logic, components and styles; `src/ui/` stays stock-agnostic. ESLint
+  enforces the import rules. Keep pure logic (scoring, `scorecard/model.ts`,
+  radar geometry) free of React and covered by tests.
+- **Styling:** CSS modules next to each component; colours only from the
+  tokens in `src/styles/tokens.css`, in both themes; respect reduced motion.
+- **The API key never reaches the server.** Don't add a route that accepts it,
+  and keep the CSP's `connect-src` to `'self'` and `api.anthropic.com`.
+- **Version bumps:** `ANALYSIS_VERSION` in `features/analysis/prompt.ts` when
+  the prompt changes; `VERSION` in `public/sw.js` when caching changes.
+- **Keep the README in step** with any change to metrics, thresholds, the page,
+  the Claude flow, the PWA, or the layout.
+

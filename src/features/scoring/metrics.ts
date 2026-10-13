@@ -1,6 +1,6 @@
 // The 13 metrics a stock is ranked on. Every metric scores 0, 5 or 10, so a
 // stock's maximum is 130. Metrics 1-7 are computed from market data; 8-13 are
-// judgement calls that Claude scores (see lib/analysis).
+// judgement calls that Claude scores (see features/analysis).
 
 export type Score = 0 | 5 | 10;
 export const SCORE_VALUES: readonly Score[] = [0, 5, 10];
@@ -31,7 +31,7 @@ export type MetricId = QuantitativeMetricId | QualitativeMetricId;
 
 export interface MetricDefinition {
   id: MetricId;
-  /** Full name, used in the statistics table. */
+  /** Full name, used in the metric rows, callouts and radar tooltips. */
   label: string;
   /** Short name that fits on a radar-chart axis. */
   axisLabel: string;

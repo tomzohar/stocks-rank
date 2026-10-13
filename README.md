@@ -1,10 +1,12 @@
 # stocks-rank
 
 A stock scanner for the **S&P 500 and Nasdaq-100** (518 stocks). Pick a stock and
-you get a radar chart (one spoke per metric, so a stock's scores draw its shape)
-plus a statistics table with the figures behind each score. Metrics 1–7 come from
-market data. Metrics 8–13 are judgement calls that **Claude** scores after
-researching the company on the web.
+you get a radar chart (one spoke per metric, so a stock's scores draw its shape),
+a score summary, callouts on what stands out, and every metric with the figure
+behind its score. Metrics 1–7 come from market data. Metrics 8–13 are judgement
+calls that **Claude** scores after researching the company on the web.
+
+Live at https://stocks-rank.vercel.app (behind Vercel's login).
 
 Each of the 13 metrics scores **0, 5 or 10**, for a maximum of **130**.
 
@@ -45,6 +47,29 @@ These are the places where the spec left room for interpretation:
   operating income when that isn't reported. If annual statements are missing,
   revenue growth falls back to Yahoo's latest-quarter YoY figure and scalability
   is n/a.
+
+## The stock page
+
+- **Radar chart:** one spoke per metric; the vertex sits at the centre for 0,
+  halfway for 5, at the edge for 10, coloured by score. Arcs round the outside
+  mark the market-data and Claude groups. Hover, tap or tab to a spoke for a
+  tooltip with its figure and the rubric line it earned. It highlights the
+  matching metric row, and the other way round. The shape grows in on load
+  and reshapes as Claude's scores arrive; a sweep runs while Claude is scoring.
+- **Total score:** a dial out of 130, a grade (Strong ≥ 70%, Mixed ≥ 40%,
+  otherwise Weak, over the metrics that have a score), points for each group,
+  and how many metrics landed on 10, 5 and 0.
+- **What stands out:** each metric that scored 10 (strengths) or 0
+  (watch-outs), as a one-line takeaway such as "Cash covers debt 3.0× over".
+- **The numbers (1–7):** each figure with a meter showing where it sits
+  against the scoring cut-offs.
+- **The judgement calls (8–13):** Claude's score and reasoning per metric, its
+  summary, sources, and the cache and key controls.
+
+The look is set by the design tokens in `src/styles/tokens.css`: light and
+dark themes that follow the system, Geist and Geist Mono (self-hosted), and the
+status colours green, amber and red, always shown alongside the number. All
+animation is switched off for people who set their system to reduce motion.
 
 ## How Claude scores metrics 8–13
 
@@ -105,16 +130,20 @@ SVGs there), plus `src/app/icon.svg` and `src/app/apple-icon.png`.
 
 ### Updates
 
-Pages load network-first, so an installed app picks up a new deploy the next
-time it opens online. For a window left open across a deploy, each build bakes
-in an id (Vercel's deployment id, or the git commit locally) that
-`/api/version` also reports. The app re-checks when it returns to the
-foreground, comes back online, or every 15 minutes, and shows *New version
-available · Reload* when the ids differ. Reload waits while Claude is
-mid-analysis, so a paid run isn't thrown away. The same id is Next.js's
-`deploymentId`, so a client-side navigation across a deploy also does a full
-reload. Bump `VERSION` in `public/sw.js` when changing what the service worker
-caches.
+A new deploy reaches an installed app in one of three ways:
+
+1. **Opening the app:** pages load network-first, so it gets the latest version.
+2. **Moving to another page:** the build id is also Next.js's `deploymentId`, so
+   a client-side navigation across a deploy turns into a full reload.
+3. **Staying on one page:** the app re-checks when it returns to the
+   foreground, comes back online, or every 15 minutes, and shows *New version
+   available · Reload*. Reload waits while Claude is mid-analysis, so a paid
+   run isn't thrown away.
+
+Each build bakes in an id (Vercel's deployment id, or the git commit locally)
+that `/api/version` also reports; the notice shows when the two differ. The
+footer shows the version a window is running (`Version <commit> · built <time>`).
+Bump `VERSION` in `public/sw.js` when changing what the service worker caches.
 
 ## Running it
 
@@ -125,7 +154,7 @@ npm install
 npm run dev          # http://localhost:3000, live Yahoo Finance data; enter your Claude key in the page
 npm run dev:demo     # offline: deterministic fake data and scores, clearly labelled
 npm run check        # lint + typecheck + unit tests
-npm run universe     # refresh the S&P 500 / Nasdaq-100 list (src/data/universe.json)
+npm run universe     # refresh the S&P 500 / Nasdaq-100 list (src/features/universe/data/universe.json)
 ```
 
 Market data comes from Yahoo Finance via [`yahoo-finance2`](https://github.com/gadicc/yahoo-finance2).
@@ -151,10 +180,12 @@ src/features/
   analysis/                    Claude scoring: prompt + tool schema (prompt.ts), API loop (claude.ts),
                                browser key + cache (browser-store.ts), hook and status/summary components
   scorecard/                   model.ts turns data + scores into rows, meters, totals and callouts (pure, tested);
-                               presenters.ts says how each market metric is shown; components/ render it
+                               presenters.ts says how each market metric is shown; components/ render the page
   radar/                       radar geometry (pure, tested), the animated RadarChart, and the RadarGlyph mark
-  pwa/                         service-worker registration, install/offline controls, the update notice
-src/ui/                        Panel, Button, Callout, ScorePill, Meter, Gauge, TierBar, Skeleton, Icon, motion
+  pwa/                         service-worker registration, install/offline controls, the update notice,
+                               the build id (version.ts) and the footer's version label
+src/ui/                        Panel, Button, Callout, ScorePill, Meter, Gauge, TierBar, CountUp, LocalTime,
+                               Skeleton, Icon, and the motion hooks (useTween, reduced-motion aware)
 src/styles/                    tokens.css (colours, type, radii for light and dark) and base.css
 public/sw.js                   service worker; public/manifest.webmanifest + public/icons/
 scripts/build-universe.mjs     regenerates src/features/universe/data/universe.json
