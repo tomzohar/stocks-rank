@@ -56,7 +56,12 @@ export function useClaudeAnalysis(subject: AnalysisSubject, demoAsOf: string | n
   let state: AnalysisState;
   if (demoAsOf) state = { status: "ready", analysis: demoAnalysis(subject, new Date(demoAsOf)) };
   else if (!hydrated) state = { status: "checking" };
-  else if (cached) state = { status: "ready", analysis: cached };
+  else if (cached)
+    state = {
+      status: "ready",
+      analysis: cached.analysis,
+      cache: { savedAt: cached.savedAt, expiresAt: cached.expiresAt },
+    };
   else if (failed) state = { status: "error", message: failed.message, keyRejected: failed.keyRejected };
   else if (!apiKey) state = { status: "needs-key" };
   else state = { status: "pending" };
@@ -66,8 +71,8 @@ export function useClaudeAnalysis(subject: AnalysisSubject, demoAsOf: string | n
     apiKey,
     /** Try again after a failure. */
     retry: () => setFailure(null),
-    /** Drop the cached result and analyze again (billed). */
-    reanalyze: () => {
+    /** Invalidate this stock's cached scores and analyze again (billed). */
+    refresh: () => {
       setFailure(null);
       clearStoredAnalysis(subject.symbol);
     },

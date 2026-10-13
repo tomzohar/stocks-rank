@@ -35,13 +35,23 @@ const storedAnalysis = z.object({
   }),
 });
 
+export interface StoredAnalysis {
+  analysis: QualitativeAnalysis;
+  /** When it was saved in this browser, and when it stops being used (ms since epoch). */
+  savedAt: number;
+  expiresAt: number;
+}
+
 /** A cached analysis, or null if missing, corrupt or older than the TTL. */
-export function parseStoredAnalysis(raw: string | null, nowMs: number): QualitativeAnalysis | null {
+export function parseStoredAnalysis(raw: string | null, nowMs: number): StoredAnalysis | null {
   if (!raw) return null;
   try {
     const parsed = storedAnalysis.safeParse(JSON.parse(raw));
-    if (!parsed.success || nowMs - parsed.data.savedAt > ANALYSIS_TTL_MS) return null;
-    return parsed.data.analysis as QualitativeAnalysis;
+    if (!parsed.success) return null;
+    const { savedAt, analysis } = parsed.data;
+    const expiresAt = savedAt + ANALYSIS_TTL_MS;
+    if (nowMs >= expiresAt) return null;
+    return { analysis: analysis as QualitativeAnalysis, savedAt, expiresAt };
   } catch {
     return null;
   }

@@ -22,12 +22,18 @@ describe("API key helpers", () => {
 describe("parseStoredAnalysis", () => {
   const stored = (savedAt: number, a: unknown = analysis) => JSON.stringify({ savedAt, analysis: a });
 
-  it("returns a fresh cached analysis", () => {
-    expect(parseStoredAnalysis(stored(now - 1000), now)).toEqual(analysis);
+  it("returns a fresh cached analysis with when it expires", () => {
+    const savedAt = now - 1000;
+    expect(parseStoredAnalysis(stored(savedAt), now)).toEqual({
+      analysis,
+      savedAt,
+      expiresAt: savedAt + 7 * 24 * 60 * 60 * 1000,
+    });
   });
 
-  it("expires entries older than the TTL", () => {
-    expect(parseStoredAnalysis(stored(now - ANALYSIS_TTL_MS - 1), now)).toBeNull();
+  it("expires entries exactly one week after they were saved", () => {
+    expect(parseStoredAnalysis(stored(now - ANALYSIS_TTL_MS + 1), now)).not.toBeNull();
+    expect(parseStoredAnalysis(stored(now - ANALYSIS_TTL_MS), now)).toBeNull();
   });
 
   it("ignores missing, corrupt or malformed entries", () => {

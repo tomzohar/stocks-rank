@@ -91,7 +91,7 @@ export function Scorecard({
             </span>
           </div>
           <RadarChart axes={radarAxes} highlighted={highlighted} onHighlight={setHighlighted} />
-          <AnalysisPanel analysis={analysis} apiKey={claude.apiKey} onReanalyze={claude.reanalyze} />
+          <AnalysisPanel analysis={analysis} apiKey={claude.apiKey} onRefresh={claude.refresh} />
         </section>
 
         <section className="panel">
@@ -229,11 +229,11 @@ function AnalysisBanner({ analysis, onRetry }: { analysis: AnalysisState; onRetr
 function AnalysisPanel({
   analysis,
   apiKey,
-  onReanalyze,
+  onRefresh,
 }: {
   analysis: AnalysisState;
   apiKey: string | null;
-  onReanalyze: () => void;
+  onRefresh: () => void;
 }) {
   const keyControls = apiKey && (
     <p className="muted key-status">
@@ -254,15 +254,23 @@ function AnalysisPanel({
       <p>{a.summary}</p>
       <p className="muted analysis-meta">
         {a.source === "demo" ? "Generated offline, not real" : `Scored by ${modelLabel(a.model)} on ${when}`}
-        {a.source === "claude" && apiKey && (
-          <>
-            {" · "}
-            <button type="button" className="link-button" onClick={onReanalyze}>
-              Re-analyze
-            </button>
-          </>
-        )}
       </p>
+      {analysis.cache && (
+        <div className="cache-info">
+          <span>
+            Saved in this browser · refreshes automatically after{" "}
+            <time dateTime={new Date(analysis.cache.expiresAt).toISOString()}>{shortDate(analysis.cache.expiresAt)}</time>
+          </span>
+          <button
+            type="button"
+            className="button button-small"
+            onClick={onRefresh}
+            title={apiKey ? "Discards the saved scores and runs a new analysis with your key" : "Discards the saved scores"}
+          >
+            Refresh now
+          </button>
+        </div>
+      )}
       {sources.length > 0 && (
         <details className="sources">
           <summary>Sources ({sources.length})</summary>
@@ -281,6 +289,10 @@ function AnalysisPanel({
       {keyControls}
     </div>
   );
+}
+
+function shortDate(ms: number): string {
+  return new Date(ms).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 function isWebUrl(url: string): boolean {

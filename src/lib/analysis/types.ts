@@ -24,7 +24,12 @@ export type AnalysisState =
   | { status: "checking" }
   | { status: "needs-key" }
   | { status: "pending" }
-  | { status: "ready"; analysis: QualitativeAnalysis }
+  | {
+      status: "ready";
+      analysis: QualitativeAnalysis;
+      /** Set when the scores come from this browser's cache. */
+      cache?: { savedAt: number; expiresAt: number };
+    }
   | { status: "error"; message: string; keyRejected: boolean };
 
 /** The company facts the analysis is keyed on — stable, so the cache stays warm. */

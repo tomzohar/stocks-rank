@@ -72,8 +72,9 @@ could receive it.
   access to the device if you chose *Remember*. Use a key you can revoke, and
   set a spend limit on it in the Claude Console.
 
-**Caching and cost.** Each analysis is cached in your browser for a week per
-stock; *Re-analyze* runs it again. An analysis is one Opus 5.5 conversation at
+**Caching and cost.** Each analysis is saved in your browser for one week per
+stock. The page shows when it expires, and *Refresh now* throws it away and runs
+a new analysis. After a week it is redone automatically on the next visit. An analysis is one Opus 5.5 conversation at
 `high` effort with up to 6 web searches, billed to your key. Web search must be
 enabled for your organization in the Claude Console. If a safety classifier
 declines, the request falls back server-side to Anthropic's recommended model

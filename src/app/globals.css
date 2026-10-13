@@ -748,3 +748,21 @@ h2 {
   cursor: pointer;
   text-decoration: underline;
 }
+
+.cache-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 0.75rem;
+  margin: 0.5rem 0;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  background: var(--bg);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.button-small {
+  font-size: 0.78rem;
+  padding: 0.2rem 0.6rem;
+}
