@@ -17,3 +17,6 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.tabs {
+  margin: -0.25rem 0 0.25rem;
+}

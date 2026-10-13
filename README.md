@@ -5,7 +5,9 @@ you get a radar chart (one spoke per metric, so a stock's scores draw its shape)
 a score summary, callouts on what stands out, and every metric with the figure
 behind its score. Metrics 1–7 come from market data. Metrics 8–13 are judgement
 calls that **Claude** scores after researching the company on the web. Keep
-the stocks you follow on a **watchlist** to compare them at a glance.
+the stocks you follow on a **watchlist** to compare them at a glance, and use
+the **DCA Chart** tab to see what a simple dollar-cost-averaging system says
+to do today.
 
 Live at https://stocks-rank.vercel.app (behind Vercel's login).
 
@@ -51,6 +53,9 @@ These are the places where the spec left room for interpretation:
 
 ## The stock page
 
+Two tabs, each with its own URL: **Scorecard** (`/stock/AAPL`, described
+below) and **DCA Chart** (`/stock/AAPL/chart`, see the next section).
+
 - **Radar chart:** one spoke per metric; the vertex sits at the centre for 0,
   halfway for 5, at the edge for 10, coloured by score. Arcs round the outside
   mark the market-data and Claude groups. Hover, tap or tab to a spoke for a
@@ -75,6 +80,44 @@ Buttons, menus and sheets follow iOS conventions so the installed app feels
 native: filled, gray, tinted and plain buttons that dim when pressed, a
 segmented control for the index filter, pull-down menus, bottom sheets, action
 sheets for destructive choices, and a tab bar on phones.
+
+## The DCA chart
+
+A rules check for dollar-cost averaging. It applies four rules to the latest
+daily close:
+
+| # | When | Then |
+|---|------|------|
+| 1 | Up 50% on your average buy price | Trim 10% of the position |
+| 2 | Up 100% on your average buy price | Trim 20% of the position |
+| 3 | 20% or more under the 52-week high | Make the next buy 2× |
+| 4 | Up 20% or more over the past month | Make the next buy 0.5× |
+
+- **Today's call** leads with the action, then each rule with whether it fires,
+  the reading behind it and the price where it would. A trim outranks a buy
+  call, and the next buy's size is shown beside it. Rules 3 and 4 multiply when
+  both fire (2 × 0.5 = 1×).
+- **Your average buy price** is needed for rules 1 and 2; without it they say
+  so and only 3 and 4 run. It is saved per stock on this device
+  (`localStorage`) and never sent anywhere.
+- **The chart** is [TradingView Lightweight Charts](https://www.tradingview.com/lightweight-charts/):
+  candles or a line, daily or monthly candles, over 6 months to 5 years. Drag,
+  pinch and scroll to explore. It draws the double-down line (20% under the
+  trailing 52-week high) as a dashed guide, and price lines for the 52-week
+  high, the 0.5× threshold, and, with your price, your average and both trim
+  levels. Markers sit on the key points.
+- **Key points** list, for the chosen range, the 52-week high, each fall into
+  the double-down zone (with how deep it went and the change three months
+  later), each 20% month, and each crossing of a trim level. Tap one to bring
+  its marker into view.
+- **Price levels** list every entry and trim level from high to low around
+  today's price, with the distance to each.
+- **Data and definitions:** six years of daily bars from Yahoo Finance (closes
+  are split-adjusted), so the 52-week high is known from the first day shown.
+  The 52-week high is the highest *close* in the past 365 days, and a month is
+  30 days. Monthly candles are rolled up from the daily bars. The engine is
+  pure and tested in `src/features/dca/`; the thresholds are `RULES` in
+  `rules.ts`.
 
 ## The watchlist
 
@@ -197,10 +240,11 @@ Features hold their own logic, components and styles. `src/ui/` is a small
 design system that knows nothing about stocks.
 
 ```
-src/app/                       routes: / · /stock/[symbol] · /watchlist · /offline · /api/stock/[symbol] · /api/version
+src/app/                       routes: / · /stock/[symbol] · /stock/[symbol]/chart · /watchlist · /offline · /api/stock/[symbol] · /api/version
 src/features/
   scoring/                     metric catalogue, thresholds and pure scoring rules (the spec lives here)
-  market-data/                 fundamentals type + pure derivations; yahoo.ts does the I/O; report.ts caches (server only)
+  market-data/                 fundamentals and daily-history types + pure derivations; yahoo.ts does the I/O;
+                               report.ts caches the report and the price history (server only)
   universe/                    S&P 500 ∪ Nasdaq-100 list, search, and the StockPicker
   analysis/                    Claude scoring: prompt + tool schema (prompt.ts), API loop (claude.ts),
                                browser key + cache (browser-store.ts), hook and status/summary components
@@ -212,12 +256,16 @@ src/features/
   watchlist/                   watchlist.ts (list edits and sorting) and summary.ts (a row's grade), pure and tested;
                                store.ts keeps the list and row data in the browser; components/ for the page,
                                rows, the add sheet and the stock page's button
+  dca/                         the DCA rules (rules.ts), rolling 52-week high and monthly change (series.ts),
+                               today's call (advice.ts), key points, monthly candles and the wording (copy.ts),
+                               all pure and tested; store.ts keeps your average price; components/ hold the
+                               view and the Lightweight Charts wrapper
   navigation/                  the phone tab bar and the header's watchlist link
 src/lib/                       format.ts (numbers and money); browser-storage.ts (guarded local/session storage
                                that notifies subscribers, for useSyncExternalStore)
 src/ui/                        Panel, Button, Callout, ScorePill, Meter, Gauge, TierBar, CountUp, LocalTime,
                                Skeleton, Icon, the motion hooks (useTween, reduced-motion aware), and the
-                               iOS-style controls: Menu, Sheet + ActionSheet, SegmentedControl, SwipeActions,
+                               iOS-style controls: Menu, Sheet + ActionSheet, SegmentedControl, TabLinks, SwipeActions,
                                Toast, and useDragReorder
 src/styles/                    tokens.css (colours, type, radii for light and dark) and base.css
 public/sw.js                   service worker; public/manifest.webmanifest + public/icons/

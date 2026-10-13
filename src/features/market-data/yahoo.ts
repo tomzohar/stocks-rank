@@ -10,6 +10,7 @@ import {
   type AnnualIncome,
   type StockFundamentals,
 } from "./fundamentals";
+import { HISTORY_YEARS, toCandles, type PriceHistory } from "./history";
 
 /** Benchmark for the 5-year comparison. SPY's adjusted close tracks the S&P 500's total return. */
 export const SP500_BENCHMARK = "SPY";
@@ -76,6 +77,18 @@ export async function fetchFundamentals(symbol: string, now = new Date()): Promi
     institutionalOwnership: stats?.heldPercentInstitutions ?? null,
     fiveYearReturn: stock5y,
     sp500FiveYearReturn: sp5y,
+    asOf: now.toISOString(),
+    source: "yahoo",
+  };
+}
+
+/** Daily bars for the chart tab. Yahoo's closes here are split-adjusted, not dividend-adjusted. */
+export async function fetchDailyHistory(symbol: string, now = new Date()): Promise<PriceHistory> {
+  const chart = await yahooFinance.chart(symbol, { period1: yearsAgo(HISTORY_YEARS, now), period2: now, interval: "1d" });
+  return {
+    symbol,
+    currency: chart.meta.currency ?? null,
+    candles: toCandles(chart.quotes),
     asOf: now.toISOString(),
     source: "yahoo",
   };

@@ -2,6 +2,7 @@
 // symbol so screenshots and UI work are repeatable without network access.
 // The UI labels it as demo data; it is not a guess at the real figures.
 import type { StockFundamentals } from "./fundamentals";
+import { HISTORY_YEARS, type Candle, type PriceHistory } from "./history";
 
 /** Small seeded PRNG (mulberry32). */
 function rng(seed: number) {
@@ -43,4 +44,46 @@ export function demoFundamentals(symbol: string, name: string, now = new Date())
     asOf: now.toISOString(),
     source: "demo",
   };
+}
+
+const DAY_MS = 86_400_000;
+
+/**
+ * A made-up daily price path that ends at `endPrice`: a random walk whose
+ * drift switches every couple of months, so rallies and drawdowns (and with
+ * them every DCA rule) show up. Deterministic per symbol and day.
+ */
+export function demoHistory(symbol: string, endPrice: number, now = new Date()): PriceHistory {
+  const r = rng(hash(`${symbol}:history`));
+  const normal = () => Math.sqrt(-2 * Math.log(1 - r())) * Math.cos(2 * Math.PI * r());
+  const end = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 20);
+  const days: number[] = [];
+  for (let t = end - HISTORY_YEARS * 365 * DAY_MS; t <= end; t += DAY_MS) {
+    const wd = new Date(t).getUTCDay();
+    if (wd !== 0 && wd !== 6) days.push(t);
+  }
+  const vol = 0.012 + r() * 0.012;
+  let drift = 0;
+  let log = 0;
+  const path: { t: number; open: number; close: number; spread: number }[] = [];
+  days.forEach((t, i) => {
+    if (i % 45 === 0) drift = (r() - 0.42) * 0.008;
+    const open = log + normal() * vol * 0.25;
+    log = open + drift + normal() * vol;
+    path.push({ t, open, close: log, spread: Math.abs(normal()) * vol * 0.7 });
+  });
+  const shift = Math.log(endPrice) - log;
+  const px = (n: number) => Math.round(Math.exp(n + shift) * 100) / 100;
+  const candles: Candle[] = path.map((p) => {
+    const open = px(p.open);
+    const close = px(p.close);
+    return {
+      t: p.t,
+      open,
+      close,
+      high: Math.round(Math.max(open, close) * (1 + p.spread) * 100) / 100,
+      low: Math.round(Math.min(open, close) * (1 - p.spread) * 100) / 100,
+    };
+  });
+  return { symbol, currency: "USD", candles, asOf: now.toISOString(), source: "demo" };
 }
