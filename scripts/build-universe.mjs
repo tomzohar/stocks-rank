@@ -1,4 +1,4 @@
-// Regenerates src/data/universe.json: the union of the S&P 500 and the Nasdaq-100.
+// Regenerates src/features/universe/data/universe.json: the union of the S&P 500 and the Nasdaq-100.
 //
 //   npm run universe
 //
@@ -125,7 +125,7 @@ const universe = {
   generatedAt: new Date().toISOString().slice(0, 10),
   stocks: [...bySymbol.values()].sort((a, b) => a.symbol.localeCompare(b.symbol)),
 };
-const out = fileURLToPath(new URL("../src/data/universe.json", import.meta.url));
+const out = fileURLToPath(new URL("../src/features/universe/data/universe.json", import.meta.url));
 // One stock per line keeps diffs readable when index membership changes.
 const body = universe.stocks.map((s) => "    " + JSON.stringify(s)).join(",\n");
 await writeFile(out, `{\n  "generatedAt": "${universe.generatedAt}",\n  "stocks": [\n${body}\n  ]\n}\n`);

@@ -1,5 +1,5 @@
-import { getStockReport } from "@/lib/report";
-import { findStock } from "@/lib/universe";
+import { getStockReport } from "@/features/market-data/report";
+import { findStock } from "@/features/universe/universe";
 
 /**
  * GET /api/stock/AAPL → { stock, fundamentals, scores } as JSON (metrics 1–7).

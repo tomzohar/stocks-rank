@@ -1,0 +1,80 @@
+/* Element defaults and app-wide utilities. Component styles live next to their components. */
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+/* A faint blueprint grid with a glow at the top, fading out downwards. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(1100px 520px at 50% -180px, var(--bg-glow), transparent 70%),
+    linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0 / 36px 36px,
+    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0 / 36px 36px;
+  mask-image: linear-gradient(180deg, #000 0%, transparent 85%);
+}
+a {
+  color: var(--series);
+  text-underline-offset: 2px;
+}
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+p {
+  margin: 0 0 0.75rem;
+}
+:focus-visible {
+  outline: 2px solid var(--series);
+  outline-offset: 2px;
+}
+::selection {
+  background: var(--series-fill);
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Entrance: children of .reveal rise in, staggered by --i. */
+.reveal > * {
+  animation: rise 0.55s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal > * {
+    animation: none;
+  }
+}

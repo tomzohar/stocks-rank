@@ -1,0 +1,19 @@
+.report {
+  display: grid;
+  gap: 1rem;
+}
+.skeletonHead {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.5rem 0.25rem;
+}
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 1rem;
+}
+@media (max-width: 960px) {
+  .skeletonGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

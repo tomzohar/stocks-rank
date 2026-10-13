@@ -1,0 +1,93 @@
+.take {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+.summary {
+  position: relative;
+  margin: 0;
+  padding: 0.85rem 1rem 0.85rem 2.6rem;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--series) 25%, var(--border));
+}
+.summary p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.55;
+}
+.quoteIcon {
+  position: absolute;
+  left: 0.9rem;
+  top: 0.95rem;
+  color: var(--series);
+}
+.meta {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.cache {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 0.75rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-strong);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.cache > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.sources summary {
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.sources ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.sources li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.5rem;
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+.sources a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+.sources li span {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+.key {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.key code {
+  font-family: var(--mono);
+  color: var(--text-secondary);
+}

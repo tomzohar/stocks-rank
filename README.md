@@ -79,7 +79,7 @@ a new analysis. After a week it is redone automatically on the next visit. An an
 enabled for your organization in the Claude Console. If a safety classifier
 declines, the request falls back server-side to Anthropic's recommended model
 (`fallbacks: "default"`), and the page names the model that answered. After
-changing the prompt, bump `ANALYSIS_VERSION` in `src/lib/analysis/prompt.ts` so
+changing the prompt, bump `ANALYSIS_VERSION` in `src/features/analysis/prompt.ts` so
 cached analyses are redone.
 
 ## Installing it (PWA)
@@ -103,6 +103,19 @@ credentials (`crossorigin="use-credentials"`). Without that, the browser can't
 read it and installing fails. Icons are in `public/icons/` (rendered from the
 SVGs there), plus `src/app/icon.svg` and `src/app/apple-icon.png`.
 
+### Updates
+
+Pages load network-first, so an installed app picks up a new deploy the next
+time it opens online. For a window left open across a deploy, each build bakes
+in an id (Vercel's deployment id, or the git commit locally) that
+`/api/version` also reports. The app re-checks when it returns to the
+foreground, comes back online, or every 15 minutes, and shows *New version
+available · Reload* when the ids differ. Reload waits while Claude is
+mid-analysis, so a paid run isn't thrown away. The same id is Next.js's
+`deploymentId`, so a client-side navigation across a deploy also does a full
+reload. Bump `VERSION` in `public/sw.js` when changing what the service worker
+caches.
+
 ## Running it
 
 Requires Node 22+.
@@ -123,20 +136,40 @@ hour per stock.
 `GET /api/stock/:symbol` returns metrics 1–7 as JSON. Claude's scores run in the
 browser and aren't part of it.
 
-## Layout
+## Architecture
+
+The code is split by feature. Routes in `src/app/` only compose features.
+Features hold their own logic, components and styles. `src/ui/` is a small
+design system that knows nothing about stocks.
 
 ```
-scripts/build-universe.mjs   regenerates the ticker list from public sources
-src/data/universe.json       S&P 500 ∪ Nasdaq-100, one stock per line
-src/lib/scoring/             metric catalogue + pure scoring rules (the spec lives here)
-src/lib/data/                fundamentals type + pure derivations; yahoo.ts does the I/O
-src/lib/report.ts            cached fetch → score pipeline (server only)
-src/lib/analysis/            Claude scoring: prompt + tool schema + validation (prompt.ts),
-                             the API loop (claude.ts), browser key + cache (browser-store.ts)
-src/components/              StockPicker, RadarChart, Scorecard
-src/app/                     / (intro), /stock/[symbol] (report), /offline, /api/stock/[symbol]
-public/sw.js                 service worker; public/manifest.webmanifest + public/icons/
+src/app/                       routes: / · /stock/[symbol] · /offline · /api/stock/[symbol] · /api/version
+src/features/
+  scoring/                     metric catalogue, thresholds and pure scoring rules (the spec lives here)
+  market-data/                 fundamentals type + pure derivations; yahoo.ts does the I/O; report.ts caches (server only)
+  universe/                    S&P 500 ∪ Nasdaq-100 list, search, and the StockPicker
+  analysis/                    Claude scoring: prompt + tool schema (prompt.ts), API loop (claude.ts),
+                               browser key + cache (browser-store.ts), hook and status/summary components
+  scorecard/                   model.ts turns data + scores into rows, meters, totals and callouts (pure, tested);
+                               presenters.ts says how each market metric is shown; components/ render it
+  radar/                       radar geometry (pure, tested), the animated RadarChart, and the RadarGlyph mark
+  pwa/                         service-worker registration, install/offline controls, the update notice
+src/ui/                        Panel, Button, Callout, ScorePill, Meter, Gauge, TierBar, Skeleton, Icon, motion
+src/styles/                    tokens.css (colours, type, radii for light and dark) and base.css
+public/sw.js                   service worker; public/manifest.webmanifest + public/icons/
+scripts/build-universe.mjs     regenerates src/features/universe/data/universe.json
 ```
 
-To change a threshold, edit `src/lib/scoring/score.ts`. Its tests in
-`score.test.ts` pin every boundary.
+Rules, enforced by ESLint: `src/ui/` must not import features, and features
+must not import routes. Each component keeps its styles in a sibling
+`.module.css` and reads colours only from the tokens.
+
+**Adding a metric:** add it to `METRICS` and its rule to `score.ts` in
+`features/scoring/`. For a market-data metric, also add an entry in
+`features/scorecard/presenters.ts` (figure, meter, takeaway). For a judgement
+call, add it to the prompt in `features/analysis/prompt.ts` and bump
+`ANALYSIS_VERSION`. The radar, tables, totals and callouts pick it up from
+there.
+
+To change a threshold, edit `THRESHOLDS` in `src/features/scoring/score.ts`.
+The scores and the meters both read it, and `score.test.ts` pins every boundary.

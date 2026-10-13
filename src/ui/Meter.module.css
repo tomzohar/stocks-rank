@@ -1,0 +1,96 @@
+.meter {
+  position: relative;
+  min-width: 8rem;
+  padding-top: 4px;
+}
+.track {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+}
+.band {
+  --c: var(--text-muted);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--c);
+  opacity: 0.22;
+}
+.band:first-child {
+  border-radius: 999px 0 0 999px;
+}
+.band:last-child {
+  border-radius: 0 999px 999px 0;
+}
+.band + .band {
+  border-left: 2px solid var(--surface);
+}
+.band.active {
+  opacity: 0.85;
+}
+.good {
+  --c: var(--good);
+}
+.warning {
+  --c: var(--warning);
+}
+.critical {
+  --c: var(--critical);
+}
+.neutral {
+  --c: var(--text-muted);
+}
+.marker {
+  --c: var(--text-primary);
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 3px solid var(--c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 22%, transparent), 0 0 12px color-mix(in srgb, var(--c) 55%, transparent);
+  animation: slide-in 0.9s var(--ease-out) both;
+}
+/* Off the scale: a small arrow points the way. */
+.marker.overflow::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  border: 4px solid transparent;
+  margin-top: -4px;
+}
+.marker[data-overflow="high"]::after {
+  left: 12px;
+  border-left-color: var(--c);
+}
+.marker[data-overflow="low"]::after {
+  right: 12px;
+  border-right-color: var(--c);
+}
+.ticks {
+  position: relative;
+  height: 1rem;
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--text-muted);
+}
+.ticks span {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+@keyframes slide-in {
+  from {
+    left: 0;
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marker {
+    animation: none;
+  }
+}

@@ -1,0 +1,89 @@
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  padding: 0.5rem 0.25rem;
+}
+.identity {
+  min-width: 0;
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+.sector,
+.index {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  background: var(--surface);
+}
+.index {
+  border-color: color-mix(in srgb, var(--series) 40%, var(--border));
+  color: var(--series);
+  background: var(--accent-soft);
+}
+.title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.85rem;
+}
+.symbol {
+  font-family: var(--mono);
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, var(--text-primary), color-mix(in srgb, var(--text-primary) 65%, var(--series)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.name {
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+.quote {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+}
+.price {
+  font-family: var(--mono);
+  font-size: 1.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.asOf {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--good);
+  box-shadow: 0 0 8px var(--good);
+}
+.demo {
+  flex-basis: 100%;
+}
+@media (max-width: 600px) {
+  .quote {
+    align-items: flex-start;
+  }
+}

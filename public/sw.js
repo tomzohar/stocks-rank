@@ -6,7 +6,7 @@
 // - Everything else, including /api/* and every other origin (notably
 //   api.anthropic.com, which carries your API key), is left untouched.
 
-const VERSION = "v1";
+const VERSION = "v2";
 const STATIC_CACHE = `stocks-rank-static-${VERSION}`;
 const PAGES_CACHE = `stocks-rank-pages-${VERSION}`;
 const OFFLINE_URL = "/offline";

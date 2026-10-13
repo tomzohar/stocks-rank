@@ -1,0 +1,135 @@
+.subtotal {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-sunken);
+  white-space: nowrap;
+}
+.subtotal b {
+  color: var(--text-primary);
+}
+.rows {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.row {
+  --c: var(--text-muted);
+  position: relative;
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 0.25rem 0.5rem;
+  padding: 0.75rem 0.75rem 0.75rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
+  animation: rise 0.5s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 45ms + 120ms);
+}
+.row + .row::before {
+  content: "";
+  position: absolute;
+  inset: -0.2rem 0.75rem auto 2.5rem;
+  height: 1px;
+  background: var(--border);
+}
+.hi {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--series) 30%, transparent);
+}
+.hi::before,
+.hi + .row::before {
+  opacity: 0;
+}
+.good {
+  --c: var(--good);
+}
+.warning {
+  --c: var(--warning);
+}
+.critical {
+  --c: var(--critical);
+}
+.num {
+  padding-top: 0.15rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.body {
+  min-width: 0;
+}
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+.verdict {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.data {
+  display: grid;
+  grid-template-columns: minmax(8.5rem, 11rem) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  margin-top: 0.55rem;
+}
+.figure {
+  display: grid;
+  min-width: 0;
+}
+.main {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.rationale {
+  margin: 0.5rem 0 0;
+  padding-left: 0.7rem;
+  border-left: 2px solid color-mix(in srgb, var(--c) 60%, var(--border));
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.skeleton {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@media (max-width: 480px) {
+  .data {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .row {
+    animation: none;
+  }
+}

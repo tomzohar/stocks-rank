@@ -1,0 +1,69 @@
+.tiers {
+  margin: 0;
+}
+.bar {
+  display: flex;
+  gap: 3px;
+  height: 10px;
+}
+.bar span {
+  --c: var(--text-muted);
+  flex-basis: 0;
+  border-radius: 3px;
+  background: var(--c);
+  box-shadow: 0 0 10px -2px color-mix(in srgb, var(--c) 70%, transparent);
+  transform-origin: left;
+  animation: grow 0.7s var(--ease-out) both;
+}
+.bar .empty {
+  background: var(--surface-sunken);
+  box-shadow: none;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.9rem;
+  margin-top: 0.55rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+.legend b {
+  font-family: var(--mono);
+  color: var(--text-primary);
+}
+.legend i {
+  --c: var(--text-muted);
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--c);
+}
+.good {
+  --c: var(--good) !important;
+}
+.warning {
+  --c: var(--warning) !important;
+}
+.critical {
+  --c: var(--critical) !important;
+}
+.neutral {
+  --c: var(--grid) !important;
+}
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bar span {
+    animation: none;
+  }
+}

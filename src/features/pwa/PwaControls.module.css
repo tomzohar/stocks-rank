@@ -1,0 +1,19 @@
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.controls:empty {
+  display: none;
+}
+.offline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--warning) 60%, var(--border));
+  background: color-mix(in srgb, var(--warning) 12%, var(--surface));
+  font-size: 0.78rem;
+  white-space: nowrap;
+}

@@ -1,0 +1,70 @@
+.form {
+  width: 100%;
+  max-width: 580px;
+  margin-top: 0.6rem;
+}
+.label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.row {
+  display: flex;
+  gap: 0.5rem;
+}
+.field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.fieldIcon {
+  position: absolute;
+  left: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+.field input {
+  width: 100%;
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem 0.5rem 2.1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-sunken);
+  color: var(--text-primary);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.field input:focus {
+  outline: none;
+  border-color: var(--series);
+  box-shadow: 0 0 0 3px var(--series-fill);
+}
+.remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.remember input {
+  accent-color: var(--series);
+}
+.problem {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: var(--critical);
+}
+.help {
+  margin: 0.45rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}

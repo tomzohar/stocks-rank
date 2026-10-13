@@ -1,6 +1,23 @@
+import { execSync } from "node:child_process";
 import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === "development";
+
+/**
+ * One id per deploy, baked into both the pages and /api/version, so an open
+ * window can tell when a newer deploy is live and offer a reload. Vercel
+ * provides it; local builds fall back to the git commit.
+ */
+function buildId(): string {
+  const fromHost = process.env.VERCEL_DEPLOYMENT_ID ?? process.env.VERCEL_GIT_COMMIT_SHA;
+  if (fromHost) return fromHost;
+  try {
+    return execSync("git rev-parse --short HEAD", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+  } catch {
+    return "local";
+  }
+}
+const BUILD_ID = buildId();
 
 // The page holds the viewer's Claude API key, so it may only talk to itself
 // and api.anthropic.com: an injected script couldn't send the key anywhere
@@ -20,6 +37,9 @@ const contentSecurityPolicy = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  // Lets Next.js itself notice a new deploy on client-side navigation and do a full reload.
+  deploymentId: BUILD_ID,
+  env: { STOCKS_RANK_BUILD_ID: BUILD_ID },
   cacheComponents: true,
   partialPrefetching: true,
   async headers() {

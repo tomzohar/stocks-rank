@@ -1,0 +1,45 @@
+.glyph {
+  display: block;
+  overflow: visible;
+}
+.disk {
+  fill: var(--surface-sunken);
+  opacity: 0.6;
+}
+.ring {
+  fill: none;
+  stroke: var(--grid);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.spoke {
+  stroke: var(--grid);
+  stroke-width: 0.6;
+  vector-effect: non-scaling-stroke;
+}
+.shape {
+  fill: var(--series-fill);
+  stroke: var(--series);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 6px var(--series-glow));
+}
+.sweep path {
+  fill: var(--series);
+  opacity: 0.18;
+}
+.sweep {
+  transform-origin: 50px 50px;
+  animation: sweep 6s linear infinite;
+}
+@keyframes sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sweep {
+    display: none;
+  }
+}

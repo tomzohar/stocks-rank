@@ -1,0 +1,93 @@
+/*
+ * Design tokens. Components read only these variables, so a theme is a
+ * single block of overrides. The status colours are fixed across themes and
+ * always paired with a number or label, never used alone.
+ */
+:root {
+  color-scheme: light;
+  --bg: #f3f5f8;
+  --bg-glow: rgb(42 120 214 / 0.1);
+  --bg-grid: rgb(15 27 45 / 0.045);
+  --surface: #ffffff;
+  --surface-2: #fafbfd;
+  --surface-sunken: #eaeef3;
+  --surface-glass: rgb(255 255 255 / 0.72);
+  --border: #e0e5ec;
+  --border-strong: #cdd5df;
+  --edge-glow: rgb(42 120 214 / 0.35);
+  --text-primary: #0b1220;
+  --text-secondary: #46505e;
+  --text-muted: #687483;
+  --grid: #d3dae4;
+
+  --series: #2a78d6;
+  --series-strong: #3b86e0;
+  --series-bright: #4fa3f7;
+  --series-fill: rgb(42 120 214 / 0.14);
+  --series-glow: rgb(42 120 214 / 0.35);
+  --accent-soft: rgb(42 120 214 / 0.09);
+
+  --good: #0ca30c;
+  --warning: #fab219;
+  --critical: #d03b3b;
+
+  --shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 10px 28px -16px rgb(15 23 42 / 0.18);
+  --radius: 14px;
+  --radius-sm: 9px;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --font: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: var(--font-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* Dark theme: follows the system unless the page forces light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #070a10;
+    --bg-glow: rgb(57 135 229 / 0.13);
+    --bg-grid: rgb(150 180 220 / 0.045);
+    --surface: #0c1119;
+    --surface-2: #111824;
+    --surface-sunken: #1a2230;
+    --surface-glass: rgb(9 13 20 / 0.72);
+    --border: #1b2431;
+    --border-strong: #2a3545;
+    --edge-glow: rgb(110 170 240 / 0.45);
+    --text-primary: #e7edf4;
+    --text-secondary: #a5b1bf;
+    --text-muted: #748193;
+    --grid: #263142;
+    --series: #3987e5;
+    --series-strong: #4a94ec;
+    --series-bright: #6cb6ff;
+    --series-fill: rgb(57 135 229 / 0.2);
+    --series-glow: rgb(57 135 229 / 0.6);
+    --accent-soft: rgb(57 135 229 / 0.12);
+    --shadow: inset 0 1px 0 rgb(255 255 255 / 0.03), 0 18px 40px -24px rgb(0 0 0 / 0.8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #070a10;
+  --bg-glow: rgb(57 135 229 / 0.13);
+  --bg-grid: rgb(150 180 220 / 0.045);
+  --surface: #0c1119;
+  --surface-2: #111824;
+  --surface-sunken: #1a2230;
+  --surface-glass: rgb(9 13 20 / 0.72);
+  --border: #1b2431;
+  --border-strong: #2a3545;
+  --edge-glow: rgb(110 170 240 / 0.45);
+  --text-primary: #e7edf4;
+  --text-secondary: #a5b1bf;
+  --text-muted: #748193;
+  --grid: #263142;
+  --series: #3987e5;
+  --series-strong: #4a94ec;
+  --series-bright: #6cb6ff;
+  --series-fill: rgb(57 135 229 / 0.2);
+  --series-glow: rgb(57 135 229 / 0.6);
+  --accent-soft: rgb(57 135 229 / 0.12);
+  --shadow: inset 0 1px 0 rgb(255 255 255 / 0.03), 0 18px 40px -24px rgb(0 0 0 / 0.8);
+}

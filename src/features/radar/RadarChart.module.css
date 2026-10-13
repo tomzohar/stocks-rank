@@ -1,0 +1,297 @@
+.radar {
+  min-width: 0;
+}
+.stage {
+  position: relative;
+}
+.stage svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Grid */
+.ring {
+  fill: none;
+  stroke: var(--grid);
+}
+.ringMajor {
+  stroke-width: 1;
+}
+.ringMinor {
+  stroke-width: 1;
+  stroke-dasharray: 1 4;
+  opacity: 0.8;
+}
+.spoke {
+  stroke: var(--grid);
+  stroke-width: 1;
+  transition: stroke 0.2s;
+}
+.spoke.qualitative {
+  stroke-dasharray: 3 4;
+}
+.spokeHi {
+  stroke: var(--series);
+  stroke-width: 1.5;
+}
+.spokePending {
+  stroke: var(--series);
+  opacity: 0.6;
+  animation: march 1s linear infinite;
+}
+@keyframes march {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+.ringLabel {
+  fill: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.groupArc {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.groupArc.quantitative {
+  stroke: var(--series);
+  opacity: 0.55;
+}
+.groupArc.qualitative {
+  stroke: var(--text-muted);
+  stroke-dasharray: 4 5;
+  opacity: 0.8;
+}
+
+/* Score shape */
+.shape {
+  fill: url(#radar-fill);
+  stroke: var(--series);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 10px var(--series-glow));
+}
+.hub {
+  fill: var(--series);
+}
+.vertex {
+  --c: var(--text-muted);
+}
+.vertex circle {
+  fill: var(--c);
+  stroke: var(--surface);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 4px var(--c));
+}
+.vertex .halo {
+  fill: color-mix(in srgb, var(--c) 18%, transparent);
+  stroke: var(--c);
+  stroke-width: 1;
+  filter: none;
+  animation: halo 1.6s var(--ease-out) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes halo {
+  0% {
+    transform: scale(0.6);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+}
+.good {
+  --c: var(--good);
+}
+.warning {
+  --c: var(--warning);
+}
+.critical {
+  --c: var(--critical);
+}
+.neutral {
+  --c: var(--text-muted);
+}
+
+/* Sweep while Claude scores */
+.sweep {
+  transform-box: view-box;
+  transform-origin: 310px 260px;
+  animation: sweep 3.2s linear infinite;
+}
+.sweepEdge {
+  stroke: var(--series-bright);
+  stroke-width: 1.5;
+  opacity: 0.8;
+}
+@keyframes sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Labels */
+.label {
+  fill: var(--text-secondary);
+  font-size: 13.5px;
+  transition: fill 0.2s;
+}
+.label.qualitative {
+  font-style: italic;
+}
+.labelHi {
+  fill: var(--text-primary);
+  font-weight: 600;
+}
+.labelScore {
+  fill: var(--text-primary);
+  font-family: var(--mono);
+  font-style: normal;
+  font-weight: 600;
+}
+.labelNone {
+  fill: var(--text-muted);
+  font-weight: 400;
+}
+/* The SVG scales down on phones; scale the labels back up so they stay legible. */
+@media (max-width: 600px) {
+  .label {
+    font-size: 19px;
+  }
+  .ringLabel {
+    font-size: 14px;
+  }
+}
+
+.hit {
+  fill: transparent;
+  cursor: pointer;
+  outline: none;
+}
+.hit:focus-visible {
+  fill: var(--accent-soft);
+}
+
+/* Tooltip */
+.tip {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  gap: 0.2rem;
+  width: max-content;
+  max-width: 15rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-glass);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 30px -12px rgb(0 0 0 / 0.45);
+  transform: translate(14px, -50%);
+  pointer-events: none;
+  animation: tip-in 0.16s var(--ease-out);
+}
+.tipLeft {
+  transform: translate(calc(-100% - 14px), -50%);
+}
+@keyframes tip-in {
+  from {
+    opacity: 0;
+  }
+}
+.tipGroup {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.tipTitle {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+.tipScore {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.tipScore i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 6px var(--c);
+}
+.tipValue {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.tipNote {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.25rem;
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+.legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+.legendLine {
+  stroke-width: 2;
+}
+.legendLine.quantitative {
+  stroke: var(--series);
+}
+.legendLine.qualitative {
+  stroke: var(--text-muted);
+  stroke-dasharray: 4 3;
+}
+.legendTones {
+  font-family: var(--mono);
+}
+.legendTones i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 0.35rem;
+  border-radius: 50%;
+  background: var(--c);
+}
+.legendTones i:first-child {
+  margin-left: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sweep,
+  .spokePending,
+  .vertex .halo {
+    animation: none;
+  }
+  .sweep {
+    display: none;
+  }
+}
