@@ -1,6 +1,7 @@
 // Runs the qualitative analysis against the Claude API: Claude researches the
 // company with web search, then answers by calling the strict submit_scores
-// tool, which we validate and never execute.
+// tool, which we validate and never execute. Runs in the browser with the
+// viewer's own API key, so the key never reaches the stocks-rank server.
 import Anthropic from "@anthropic-ai/sdk";
 import {
   ANALYSIS_MODEL,
@@ -27,9 +28,15 @@ export class AnalysisError extends Error {}
 /** Server-tool pauses and the one "please submit" nudge, together. */
 const MAX_REQUESTS = 4;
 
-export function createClient(): MessagesClient {
-  // Stay inside the 300 s function limit: one retry, each attempt capped.
-  return new Anthropic({ timeout: 120_000, maxRetries: 1 });
+/**
+ * A client that calls api.anthropic.com straight from the browser with the
+ * viewer's key. The SDK makes this opt-in because a key in a web page is only
+ * as safe as the page; that's acceptable here because it is the viewer's own
+ * key, kept in their browser, and the site's CSP only lets the page talk to
+ * itself and api.anthropic.com.
+ */
+export function createBrowserClient(apiKey: string): MessagesClient {
+  return new Anthropic({ apiKey, dangerouslyAllowBrowser: true, timeout: 180_000, maxRetries: 1 });
 }
 
 function searchResultsIn(content: readonly BetaContentBlock[]): { title: string; url: string }[] {
@@ -54,7 +61,7 @@ export function continuationContent(content: readonly BetaContentBlock[]): BetaC
 
 export async function analyzeWithClaude(
   subject: AnalysisSubject,
-  { client = createClient(), now = new Date() }: { client?: MessagesClient; now?: Date } = {},
+  { client, now = new Date() }: { client: MessagesClient; now?: Date },
 ): Promise<QualitativeAnalysis> {
   const messages: BetaMessageParam[] = [
     { role: "user", content: buildUserMessage(subject, now.toISOString().slice(0, 10)) },

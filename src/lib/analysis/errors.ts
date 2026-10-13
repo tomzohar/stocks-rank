@@ -13,7 +13,7 @@ function apiMessage(err: InstanceType<typeof Anthropic.APIError>): string {
 export function describeAnalysisError(err: unknown): string {
   if (err instanceof AnalysisError) return err.message;
   if (err instanceof Anthropic.AuthenticationError) {
-    return "Anthropic rejected the API key. Check ANTHROPIC_API_KEY in the deployment's environment variables.";
+    return "Anthropic rejected this API key. Check it, or enter a different one.";
   }
   if (err instanceof Anthropic.PermissionDeniedError) {
     return `The API key isn't allowed to do this: ${apiMessage(err)}`;
@@ -37,4 +37,9 @@ export function describeAnalysisError(err: unknown): string {
     return "Claude's answer didn't match the expected format. Reload to try again.";
   }
   return "Something went wrong while Claude was scoring. Reload to try again.";
+}
+
+/** True when the key itself is the problem, so the page should ask for another. */
+export function isKeyRejected(err: unknown): boolean {
+  return err instanceof Anthropic.AuthenticationError || err instanceof Anthropic.PermissionDeniedError;
 }

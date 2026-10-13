@@ -48,27 +48,38 @@ These are the places where the spec left room for interpretation:
 
 ## How Claude scores metrics 8–13
 
-On a stock's page, Claude Opus 5.5 (`claude-opus-5-5`) gets the rubric above.
-It checks recent facts with web search (the current CEO, leadership changes,
-layoffs, scandals), then answers by calling a strict `submit_scores` tool. The
-app validates the answer: every metric must be present, and each score must be
-exactly 0, 5 or 10. Each metric gets a one- or two-sentence rationale, and the
-page shows Claude's summary and the sources it relied on. Only URLs that its
-searches actually returned are listed.
+On a stock's page you're asked for **your own Claude API key**. Then, in your
+browser, Claude Opus 5.5 (`claude-opus-5-5`) gets the rubric above. It checks
+recent facts with web search (the current CEO, leadership changes, layoffs,
+scandals), then answers by calling a strict `submit_scores` tool. The app
+validates the answer: every metric must be present, and each score must be
+exactly 0, 5 or 10. The page shows a rationale per metric, Claude's summary,
+and the sources it relied on. Only http(s) URLs that its searches actually
+returned are listed.
 
-- **Caching:** an analysis is cached for a week per stock in Next's data cache,
-  and the cache survives deploys. A first view takes about a minute while
-  Claude researches; the market-data scores show right away. To force fresh
-  analyses after changing the prompt, bump `ANALYSIS_VERSION` in
-  `src/lib/analysis/prompt.ts`.
-- **Refusals:** if a safety classifier declines, the request falls back
-  server-side to Anthropic's recommended model (`fallbacks: "default"`). The
-  page names the model that answered.
-- **Cost:** each analysis is one Opus 5.5 conversation at `high` effort with up
-  to 6 web searches. It's billed to your Anthropic account, roughly tens of
-  cents per stock per week. Anyone who can open the site can trigger it.
-- **No key:** without `ANTHROPIC_API_KEY`, metrics 8–13 show "Not scored" and the
-  rest of the app works.
+**Where your key goes.** The browser calls `api.anthropic.com` directly. The key
+is never sent to the stocks-rank server, and the server has no code path that
+could receive it.
+
+- **Storage:** the key is kept in `sessionStorage` (until the tab closes), or in
+  `localStorage` if you tick *Remember on this device*. *Forget key* removes it
+  from both.
+- **Content Security Policy:** the page may only connect to itself and
+  `api.anthropic.com` (`next.config.ts`), so an injected script couldn't send
+  the key elsewhere. Model output is rendered as text, never as HTML.
+- **Residual risk:** a key in a web page can still be read by anything that runs
+  in that page or browser, such as a malicious extension, or by someone with
+  access to the device if you chose *Remember*. Use a key you can revoke, and
+  set a spend limit on it in the Claude Console.
+
+**Caching and cost.** Each analysis is cached in your browser for a week per
+stock; *Re-analyze* runs it again. An analysis is one Opus 5.5 conversation at
+`high` effort with up to 6 web searches, billed to your key. Web search must be
+enabled for your organization in the Claude Console. If a safety classifier
+declines, the request falls back server-side to Anthropic's recommended model
+(`fallbacks: "default"`), and the page names the model that answered. After
+changing the prompt, bump `ANALYSIS_VERSION` in `src/lib/analysis/prompt.ts` so
+cached analyses are redone.
 
 ## Running it
 
@@ -76,24 +87,19 @@ Requires Node 22+.
 
 ```bash
 npm install
-export ANTHROPIC_API_KEY=sk-ant-...   # for Claude's scores (metrics 8–13)
-npm run dev          # http://localhost:3000, live Yahoo Finance data + Claude
+npm run dev          # http://localhost:3000, live Yahoo Finance data; enter your Claude key in the page
 npm run dev:demo     # offline: deterministic fake data and scores, clearly labelled
 npm run check        # lint + typecheck + unit tests
 npm run universe     # refresh the S&P 500 / Nasdaq-100 list (src/data/universe.json)
 ```
-
-On Vercel, set `ANTHROPIC_API_KEY` under Project → Settings → Environment
-Variables (Production and Preview). Web search must be enabled for your
-organization in the Claude Console.
 
 Market data comes from Yahoo Finance via [`yahoo-finance2`](https://github.com/gadicc/yahoo-finance2).
 No API key is needed. The data is unofficial and delayed, so treat it as a
 screening aid and not as investment advice. Responses are cached for about an
 hour per stock.
 
-`GET /api/stock/:symbol` returns the same report as JSON, including Claude's
-`analysis`.
+`GET /api/stock/:symbol` returns metrics 1–7 as JSON. Claude's scores run in the
+browser and aren't part of it.
 
 ## Layout
 
@@ -104,7 +110,7 @@ src/lib/scoring/             metric catalogue + pure scoring rules (the spec liv
 src/lib/data/                fundamentals type + pure derivations; yahoo.ts does the I/O
 src/lib/report.ts            cached fetch → score pipeline (server only)
 src/lib/analysis/            Claude scoring: prompt + tool schema + validation (prompt.ts),
-                             the API loop (claude.ts), caching and fallbacks (index.ts)
+                             the API loop (claude.ts), browser key + cache (browser-store.ts)
 src/components/              StockPicker, RadarChart, Scorecard
 src/app/                     / (intro), /stock/[symbol] (report), /api/stock/[symbol]
 ```

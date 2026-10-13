@@ -6,7 +6,8 @@ export default function Home() {
       <h2>Pick a stock to rank it</h2>
       <p>
         Each stock is scored 0, 5 or 10 on {METRICS.length} metrics. The first seven come from market data. The rest
-        are judgement calls that Claude scores after researching the company, with a short rationale for each.
+        are judgement calls that Claude scores after researching the company, with a short rationale for each. You
+        bring your own Claude API key; it stays in your browser.
       </p>
       <ol className="metric-list">
         {METRICS.map((m) => (

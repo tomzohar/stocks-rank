@@ -1,12 +1,8 @@
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import { Scorecard } from "@/components/Scorecard";
-import { analysisSubject, getAnalysis } from "@/lib/analysis";
 import { getStockReport, type StockReport } from "@/lib/report";
-import { findStock, type Stock } from "@/lib/universe";
-
-// Claude's research (web searches, then scoring) can take a minute or two.
-export const maxDuration = 300;
+import { findStock } from "@/lib/universe";
 
 export default function StockPage({ params }: PageProps<"/stock/[symbol]">) {
   return (
@@ -35,18 +31,8 @@ async function Report({ params }: { params: PageProps<"/stock/[symbol]">["params
       </section>
     );
   }
-  // Market-data scores render right away; Claude's scores stream in when ready.
-  const fallback = <Scorecard stock={stock} {...report} analysis={{ status: "pending" }} />;
-  return (
-    <Suspense fallback={fallback}>
-      <AnalyzedScorecard stock={stock} report={report} />
-    </Suspense>
-  );
-}
-
-async function AnalyzedScorecard({ stock, report }: { stock: Stock; report: StockReport }) {
-  const analysis = await getAnalysis(analysisSubject(stock));
-  return <Scorecard stock={stock} {...report} analysis={analysis} />;
+  // Claude's scores (metrics 8–13) are fetched in the browser with the viewer's own key.
+  return <Scorecard stock={stock} {...report} />;
 }
 
 function ReportSkeleton() {

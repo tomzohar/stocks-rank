@@ -20,10 +20,12 @@ export interface QualitativeAnalysis {
 
 /** What the UI renders for metrics 8–13. */
 export type AnalysisState =
+  /** Before the browser has read its stored key and cache. */
+  | { status: "checking" }
+  | { status: "needs-key" }
   | { status: "pending" }
   | { status: "ready"; analysis: QualitativeAnalysis }
-  | { status: "unavailable"; reason: string }
-  | { status: "error"; message: string };
+  | { status: "error"; message: string; keyRejected: boolean };
 
 /** The company facts the analysis is keyed on — stable, so the cache stays warm. */
 export interface AnalysisSubject {

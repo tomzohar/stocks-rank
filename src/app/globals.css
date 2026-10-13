@@ -655,3 +655,96 @@ h2 {
     animation-duration: 3s;
   }
 }
+
+/* API key prompt */
+.banner-key {
+  flex-direction: column;
+  border-color: var(--series);
+}
+.banner-error {
+  flex-direction: column;
+}
+.banner-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  width: 100%;
+}
+.banner-row > span:nth-child(2) {
+  flex: 1;
+}
+.key-form {
+  width: 100%;
+  max-width: 560px;
+}
+.key-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.key-row {
+  display: flex;
+  gap: 0.5rem;
+}
+.key-row input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-family: var(--mono);
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-primary);
+}
+.key-row input:focus {
+  outline: 2px solid var(--series);
+  outline-offset: -1px;
+}
+.key-remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.key-problem {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  color: var(--critical);
+}
+.key-help {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+}
+.key-status {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+}
+.button {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.button-primary {
+  background: var(--series);
+  border-color: var(--series);
+  color: #fff;
+}
+.link-button {
+  font: inherit;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--series);
+  cursor: pointer;
+  text-decoration: underline;
+}

@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { forgetApiKey, keyHint } from "@/lib/analysis/browser-store";
+import { analysisSubject } from "@/lib/analysis/subject";
 import type { AnalysisState } from "@/lib/analysis/types";
 import type { StockFundamentals } from "@/lib/data/fundamentals";
 import { formatMoney, formatPercent, formatPoints, formatPrice } from "@/lib/format";
@@ -17,26 +19,29 @@ import {
 } from "@/lib/scoring/metrics";
 import { totalScore, type Scores } from "@/lib/scoring/score";
 import { INDEX_LABELS, type Stock } from "@/lib/universe";
+import { ApiKeyForm } from "./ApiKeyForm";
 import { RadarChart, scoreTone } from "./RadarChart";
+import { useClaudeAnalysis } from "./useClaudeAnalysis";
 
 export function Scorecard({
   stock,
   fundamentals: f,
   scores: quantitative,
-  analysis,
 }: {
   stock: Stock;
   fundamentals: StockFundamentals;
   scores: Record<QuantitativeMetricId, Score | null>;
-  analysis: AnalysisState;
 }) {
   const [highlighted, setHighlighted] = useState<MetricId | null>(null);
+  const subject = useMemo(() => analysisSubject(stock), [stock]);
+  const claude = useClaudeAnalysis(subject, f.source === "demo" ? f.asOf : null);
+  const analysis = claude.state;
 
   const assessed = analysis.status === "ready" ? analysis.analysis.metrics : null;
   const qualitative = Object.fromEntries(
     QUALITATIVE_METRIC_IDS.map((id) => [id, assessed?.[id].score ?? null]),
   ) as Record<QualitativeMetricId, Score | null>;
-  const pending = analysis.status === "pending";
+  const pending = analysis.status === "pending" || analysis.status === "checking";
 
   const scores: Scores = { ...quantitative, ...qualitative };
   const total = totalScore(scores);
@@ -72,7 +77,7 @@ export function Scorecard({
         </div>
       </header>
 
-      <AnalysisBanner analysis={analysis} />
+      <AnalysisBanner analysis={analysis} onRetry={claude.retry} />
 
       <div className="scorecard-grid">
         <section className="panel">
@@ -82,11 +87,11 @@ export function Scorecard({
             <span className="muted total-note">
               {total.scoredCount} of {METRICS.length} metrics scored
               {total.ratio !== null && ` · ${Math.round(total.ratio * 100)}% of the points available on those`}
-              {pending && " · Claude is scoring the rest"}
+              {analysis.status === "pending" && " · Claude is scoring the rest"}
             </span>
           </div>
           <RadarChart axes={radarAxes} highlighted={highlighted} onHighlight={setHighlighted} />
-          <AnalysisPanel analysis={analysis} />
+          <AnalysisPanel analysis={analysis} apiKey={claude.apiKey} onReanalyze={claude.reanalyze} />
         </section>
 
         <section className="panel">
@@ -162,11 +167,12 @@ function ScoreBadge({ score }: { score: Score | null }) {
 
 function Rationale({ analysis, id }: { analysis: AnalysisState; id: QualitativeMetricId }) {
   switch (analysis.status) {
+    case "checking":
     case "pending":
       return <span className="skeleton-text" aria-label="Claude is analyzing" />;
     case "ready":
       return <span className="rationale">{analysis.analysis.metrics[id].rationale}</span>;
-    case "unavailable":
+    case "needs-key":
     case "error":
       return <span className="stat-sub">Not scored</span>;
   }
@@ -174,45 +180,73 @@ function Rationale({ analysis, id }: { analysis: AnalysisState; id: QualitativeM
 
 /** Who scored metrics 8–13, Claude's summary, and its sources. */
 /** Says loudly what's happening with metrics 8–13 until Claude's scores are in. */
-function AnalysisBanner({ analysis }: { analysis: AnalysisState }) {
+function AnalysisBanner({ analysis, onRetry }: { analysis: AnalysisState; onRetry: () => void }) {
   switch (analysis.status) {
     case "ready":
+    case "checking":
       return null;
+    case "needs-key":
+      return (
+        <div className="banner banner-key" role="region" aria-label="Set up Claude scoring">
+          <div>
+            <strong>Let Claude score metrics 8–13.</strong> Enter your Claude API key. Claude researches the company on
+            the web and scores moat, CEO, recession resilience, secular trend, culture and talent.
+          </div>
+          <ApiKeyForm />
+        </div>
+      );
     case "pending":
       return (
         <div className="banner banner-pending" role="status">
           <span className="spinner" aria-hidden="true" />
           <span>
             <strong>Claude is scoring metrics 8–13.</strong> It&apos;s researching the company on the web, which takes
-            about a minute the first time. Scores fill in here when it&apos;s done.
-          </span>
-        </div>
-      );
-    case "unavailable":
-      return (
-        <div className="banner banner-off" role="status">
-          <span className="banner-icon" aria-hidden="true">!</span>
-          <span>
-            <strong>Claude scoring is off.</strong> {analysis.reason}
+            about a minute. Scores fill in here when it&apos;s done.
           </span>
         </div>
       );
     case "error":
       return (
         <div className="banner banner-error" role="alert">
-          <span className="banner-icon" aria-hidden="true">×</span>
-          <span>
-            <strong>Claude couldn&apos;t score metrics 8–13.</strong> {analysis.message}
-          </span>
+          <div className="banner-row">
+            <span className="banner-icon" aria-hidden="true">×</span>
+            <span>
+              <strong>Claude couldn&apos;t score metrics 8–13.</strong> {analysis.message}
+            </span>
+            {!analysis.keyRejected && (
+              <button type="button" className="button" onClick={onRetry}>
+                Try again
+              </button>
+            )}
+          </div>
+          {analysis.keyRejected && <ApiKeyForm submitLabel="Use this key instead" />}
         </div>
       );
   }
 }
 
-/** Claude's summary, who scored it, and its sources — once the scores are in. */
-function AnalysisPanel({ analysis }: { analysis: AnalysisState }) {
-  if (analysis.status !== "ready") return null;
+/** Claude's summary, who scored it, its sources, and the key controls. */
+function AnalysisPanel({
+  analysis,
+  apiKey,
+  onReanalyze,
+}: {
+  analysis: AnalysisState;
+  apiKey: string | null;
+  onReanalyze: () => void;
+}) {
+  const keyControls = apiKey && (
+    <p className="muted key-status">
+      Using your key {keyHint(apiKey)} ·{" "}
+      <button type="button" className="link-button" onClick={forgetApiKey}>
+        Forget key
+      </button>
+    </p>
+  );
+  if (analysis.status !== "ready") return keyControls ? <div className="analysis">{keyControls}</div> : null;
   const a = analysis.analysis;
+  // Only plain web links: never render a javascript: or data: URL as a link.
+  const sources = a.sources.filter((src) => isWebUrl(src.url));
   const when = new Date(a.analyzedAt).toLocaleDateString("en-US", { dateStyle: "medium" });
   return (
     <div className="analysis">
@@ -220,12 +254,20 @@ function AnalysisPanel({ analysis }: { analysis: AnalysisState }) {
       <p>{a.summary}</p>
       <p className="muted analysis-meta">
         {a.source === "demo" ? "Generated offline, not real" : `Scored by ${modelLabel(a.model)} on ${when}`}
+        {a.source === "claude" && apiKey && (
+          <>
+            {" · "}
+            <button type="button" className="link-button" onClick={onReanalyze}>
+              Re-analyze
+            </button>
+          </>
+        )}
       </p>
-      {a.sources.length > 0 && (
+      {sources.length > 0 && (
         <details className="sources">
-          <summary>Sources ({a.sources.length})</summary>
+          <summary>Sources ({sources.length})</summary>
           <ul>
-            {a.sources.map((src) => (
+            {sources.map((src) => (
               <li key={src.url}>
                 <a href={src.url} target="_blank" rel="noopener noreferrer">
                   {src.title}
@@ -236,8 +278,18 @@ function AnalysisPanel({ analysis }: { analysis: AnalysisState }) {
           </ul>
         </details>
       )}
+      {keyControls}
     </div>
   );
+}
+
+function isWebUrl(url: string): boolean {
+  try {
+    const { protocol } = new URL(url);
+    return protocol === "https:" || protocol === "http:";
+  } catch {
+    return false;
+  }
 }
 
 const MODEL_NAMES: Record<string, string> = {
