@@ -766,3 +766,26 @@ h2 {
   font-size: 0.78rem;
   padding: 0.2rem 0.6rem;
 }
+
+/* PWA */
+.pwa {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.pwa:empty {
+  display: none;
+}
+.offline-pill {
+  font-size: 0.78rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--warning);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+@media (display-mode: standalone) {
+  .app-header {
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+}

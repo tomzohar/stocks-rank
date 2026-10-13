@@ -82,6 +82,27 @@ declines, the request falls back server-side to Anthropic's recommended model
 changing the prompt, bump `ANALYSIS_VERSION` in `src/lib/analysis/prompt.ts` so
 cached analyses are redone.
 
+## Installing it (PWA)
+
+stocks-rank is an installable Progressive Web App:
+
+- **Desktop Chrome or Edge:** use the *Install app* button in the header, or the
+  install icon in the address bar.
+- **Android:** browser menu → *Install app* / *Add to Home screen*.
+- **iPhone and iPad:** Safari → Share → *Add to Home Screen*.
+
+The service worker (`public/sw.js`) loads pages network-first. The last 50
+pages you opened stay available offline, showing their market data's "as of"
+time and Claude's saved scores, and an *Offline* badge appears in the header.
+Pages you haven't opened show an offline notice. Build assets are cached by
+their hashed names. `/api/*` and every other origin, including
+`api.anthropic.com`, are never intercepted or cached.
+
+The site is behind Vercel's login, so the manifest link is sent with
+credentials (`crossorigin="use-credentials"`). Without that, the browser can't
+read it and installing fails. Icons are in `public/icons/` (rendered from the
+SVGs there), plus `src/app/icon.svg` and `src/app/apple-icon.png`.
+
 ## Running it
 
 Requires Node 22+.
@@ -113,7 +134,8 @@ src/lib/report.ts            cached fetch → score pipeline (server only)
 src/lib/analysis/            Claude scoring: prompt + tool schema + validation (prompt.ts),
                              the API loop (claude.ts), browser key + cache (browser-store.ts)
 src/components/              StockPicker, RadarChart, Scorecard
-src/app/                     / (intro), /stock/[symbol] (report), /api/stock/[symbol]
+src/app/                     / (intro), /stock/[symbol] (report), /offline, /api/stock/[symbol]
+public/sw.js                 service worker; public/manifest.webmanifest + public/icons/
 ```
 
 To change a threshold, edit `src/lib/scoring/score.ts`. Its tests in
