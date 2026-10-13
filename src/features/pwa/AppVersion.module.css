@@ -1,0 +1,10 @@
+.version {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+}
+.version code {
+  font-family: inherit;
+  color: var(--text-secondary);
+}

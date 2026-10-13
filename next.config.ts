@@ -19,6 +19,17 @@ function buildId(): string {
 }
 const BUILD_ID = buildId();
 
+/** The commit being built, shortened, for the version label in the footer. */
+function commit(): string {
+  const sha = process.env.VERCEL_GIT_COMMIT_SHA;
+  if (sha) return sha.slice(0, 7);
+  try {
+    return execSync("git rev-parse --short HEAD", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+  } catch {
+    return "local";
+  }
+}
+
 // The page holds the viewer's Claude API key, so it may only talk to itself
 // and api.anthropic.com: an injected script couldn't send the key anywhere
 // else. Inline scripts are needed by Next's streaming without nonces.
@@ -39,7 +50,11 @@ const contentSecurityPolicy = [
 const nextConfig: NextConfig = {
   // Lets Next.js itself notice a new deploy on client-side navigation and do a full reload.
   deploymentId: BUILD_ID,
-  env: { STOCKS_RANK_BUILD_ID: BUILD_ID },
+  env: {
+    STOCKS_RANK_BUILD_ID: BUILD_ID,
+    STOCKS_RANK_COMMIT: commit(),
+    STOCKS_RANK_BUILT_AT: new Date().toISOString(),
+  },
   cacheComponents: true,
   partialPrefetching: true,
   async headers() {

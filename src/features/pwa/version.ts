@@ -4,6 +4,10 @@
 
 export const BUILD_ID: string = process.env.STOCKS_RANK_BUILD_ID ?? "dev";
 
+/** Shown in the footer so you can tell which version a window is running. */
+export const COMMIT: string = process.env.STOCKS_RANK_COMMIT ?? "dev";
+export const BUILT_AT: string | null = process.env.STOCKS_RANK_BUILT_AT ?? null;
+
 /** Reads `{ build }` from /api/version; anything else (offline, a login page) counts as unknown. */
 export function parseVersion(body: unknown): string | null {
   if (typeof body !== "object" || body === null) return null;

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { AppVersion } from "@/features/pwa/AppVersion";
 import { PwaControls } from "@/features/pwa/PwaControls";
 import { UpdateNotice } from "@/features/pwa/UpdateNotice";
 import { RadarGlyph } from "@/features/radar/RadarGlyph";
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <footer className={styles.footer}>
           Market data from Yahoo Finance, delayed and unofficial. Index membership as of {UNIVERSE_DATE}. Not
           investment advice.
+          <AppVersion />
         </footer>
         <UpdateNotice />
       </body>
