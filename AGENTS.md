@@ -22,10 +22,16 @@ and the architecture.
   radar geometry) free of React and covered by tests.
 - **Styling:** CSS modules next to each component; colours only from the
   tokens in `src/styles/tokens.css`, in both themes; respect reduced motion.
+  Controls follow iOS conventions: reuse `Button`, `Menu`, `Sheet`/`ActionSheet`,
+  `SegmentedControl`, `SwipeActions` and `Toast` from `src/ui/` before adding new ones.
+- **Browser state** (the API key, Claude's cache, the watchlist) goes through
+  `src/lib/browser-storage.ts`, keys prefixed `stocks-rank:`, read with
+  `useSyncExternalStore`. Anything a swipe does must also be reachable by
+  keyboard or mouse.
 - **The API key never reaches the server.** Don't add a route that accepts it,
   and keep the CSP's `connect-src` to `'self'` and `api.anthropic.com`.
 - **Version bumps:** `ANALYSIS_VERSION` in `features/analysis/prompt.ts` when
   the prompt changes; `VERSION` in `public/sw.js` when caching changes.
 - **Keep the README in step** with any change to metrics, thresholds, the page,
-  the Claude flow, the PWA, or the layout.
+  the watchlist, the Claude flow, the PWA, or the layout.
 

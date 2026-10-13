@@ -1,0 +1,24 @@
+.button {
+  min-width: 11.5rem;
+}
+.unknown {
+  visibility: hidden;
+}
+/* The star pops when the stock is added. */
+.on svg {
+  color: var(--warning);
+  animation: pop 0.45s var(--ease-spring);
+}
+@keyframes pop {
+  0% {
+    transform: scale(0.4) rotate(-30deg);
+  }
+  60% {
+    transform: scale(1.25) rotate(8deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .on svg {
+    animation: none;
+  }
+}

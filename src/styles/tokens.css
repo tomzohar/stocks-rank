@@ -19,6 +19,12 @@
   --text-secondary: #46505e;
   --text-muted: #687483;
   --grid: #d3dae4;
+  /* iOS-style fills for buttons, and the frosted material of menus and sheets.
+     Nearly opaque: a blur can't reach through animated or blurred ancestors. */
+  --fill: rgb(118 118 128 / 0.12);
+  --fill-strong: rgb(118 118 128 / 0.2);
+  --material: rgb(249 250 252 / 0.96);
+  --scrim: rgb(8 12 20 / 0.32);
 
   --series: #2a78d6;
   --series-strong: #3b86e0;
@@ -35,6 +41,10 @@
   --radius: 14px;
   --radius-sm: 9px;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* A soft spring, for things that pop in like iOS menus and sheets. */
+  --ease-spring: cubic-bezier(0.32, 1.25, 0.5, 1);
+  /* Height of the phone tab bar; 0 where there is none. Fixed toasts sit above it. */
+  --tabbar-h: 0px;
 
   --font: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono: var(--font-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -58,6 +68,10 @@
     --text-secondary: #a5b1bf;
     --text-muted: #748193;
     --grid: #263142;
+    --fill: rgb(118 128 148 / 0.2);
+    --fill-strong: rgb(118 128 148 / 0.3);
+    --material: rgb(22 29 41 / 0.96);
+    --scrim: rgb(0 0 0 / 0.55);
     --series: #3987e5;
     --series-strong: #4a94ec;
     --series-bright: #6cb6ff;
@@ -83,6 +97,10 @@
   --text-secondary: #a5b1bf;
   --text-muted: #748193;
   --grid: #263142;
+  --fill: rgb(118 128 148 / 0.2);
+  --fill-strong: rgb(118 128 148 / 0.3);
+  --material: rgb(22 29 41 / 0.96);
+  --scrim: rgb(0 0 0 / 0.55);
   --series: #3987e5;
   --series-strong: #4a94ec;
   --series-bright: #6cb6ff;

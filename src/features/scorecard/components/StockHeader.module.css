@@ -79,6 +79,11 @@
   background: var(--good);
   box-shadow: 0 0 8px var(--good);
 }
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
 .demo {
   flex-basis: 100%;
 }

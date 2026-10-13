@@ -3,6 +3,7 @@
 import { useId, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/ui/Icon";
+import { SegmentedControl } from "@/ui/SegmentedControl";
 import styles from "./StockPicker.module.css";
 import { INDEX_LABELS, searchStocks, STOCKS, type IndexId } from "./universe";
 
@@ -52,22 +53,23 @@ export function StockPicker() {
 
   return (
     <div className={styles.picker}>
-      <div className={styles.filters} role="group" aria-label="Index">
-        {FILTERS.map((f) => (
-          <button
-            key={f.id}
-            type="button"
-            className={styles.chip}
-            aria-pressed={filter === f.id}
-            onClick={() => {
-              setFilter(f.id);
-              setActive(0);
-            }}
-          >
-            {f.label} <span className={styles.count}>{f.count}</span>
-          </button>
-        ))}
-      </div>
+      <SegmentedControl
+        label="Index"
+        className={styles.filters}
+        value={filter}
+        onChange={(id) => {
+          setFilter(id);
+          setActive(0);
+        }}
+        segments={FILTERS.map((f) => ({
+          id: f.id,
+          label: (
+            <>
+              {f.label} <span className={styles.count}>{f.count}</span>
+            </>
+          ),
+        }))}
+      />
       <div className={styles.box}>
         <Icon name="search" size={16} className={styles.searchIcon} />
         <input

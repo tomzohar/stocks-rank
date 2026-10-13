@@ -1,0 +1,118 @@
+/* iOS search field: a gray rounded bar with the glass icon inside. */
+.search {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 0.6rem;
+  border-radius: 10px;
+  background: var(--fill);
+  color: var(--text-muted);
+  box-shadow: 0 -0.5rem 0 var(--surface);
+}
+.search input {
+  flex: 1;
+  min-width: 0;
+  min-height: 2.35rem;
+  border: 0;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 1rem;
+  outline: none;
+}
+.search:focus-within {
+  box-shadow:
+    0 -0.5rem 0 var(--surface),
+    0 0 0 2px var(--series-fill);
+}
+.section {
+  margin: 1rem 0 0.35rem 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: 12px;
+  background: var(--surface-2);
+  border: 0.5px solid var(--border);
+  overflow: hidden;
+}
+.list li + li .item {
+  border-top: 0.5px solid var(--border);
+}
+.item {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.45rem 0.6rem 0.45rem 0.85rem;
+  border: 0;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.item:hover {
+  background: color-mix(in srgb, var(--fill) 50%, transparent);
+}
+.item:active {
+  background: var(--fill);
+}
+.item:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.item:focus-visible {
+  outline-offset: -2px;
+}
+.symbol {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--series) 15%, transparent);
+  color: var(--series);
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    transform 0.35s var(--ease-spring);
+}
+.toggle svg {
+  stroke-width: 2.4;
+}
+.on {
+  background: var(--series);
+  color: #fff;
+  transform: scale(1.06);
+}
+.empty {
+  margin: 0.75rem 0.25rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}

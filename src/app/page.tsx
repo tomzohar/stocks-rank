@@ -1,14 +1,10 @@
 import Link from "next/link";
 import { RadarGlyph } from "@/features/radar/RadarGlyph";
 import { METRICS } from "@/features/scoring/metrics";
-import { findStock, STOCKS } from "@/features/universe/universe";
+import { POPULAR, STOCKS } from "@/features/universe/universe";
 import { Icon } from "@/ui/Icon";
 import { Panel } from "@/ui/Panel";
 import styles from "./page.module.css";
-
-const QUICK_PICKS = ["NVDA", "AAPL", "MSFT", "AMZN", "GOOGL", "META", "COST", "JPM"]
-  .map((s) => findStock(s))
-  .filter((s) => s !== undefined);
 
 const SAMPLE = [10, 7, 9, 5, 8, 10, 6, 9, 4, 8, 7, 10, 6];
 
@@ -31,7 +27,7 @@ export default function Home() {
           </p>
           <div className={styles.picks}>
             <span className={styles.picksLabel}>Try</span>
-            {QUICK_PICKS.map((s) => (
+            {POPULAR.map((s) => (
               <Link key={s.symbol} href={`/stock/${s.symbol}`} className={styles.pick}>
                 {s.symbol}
               </Link>

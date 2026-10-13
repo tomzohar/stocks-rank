@@ -14,7 +14,22 @@ const PATHS = {
   arrowDown: "M12 5v14m0 0l-6-6m6 6l6-6",
   search: "M20 20l-4.3-4.3M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z",
   database: "M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zm0 0v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3",
+  star: "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5z",
+  starFill: "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5z",
+  plus: "M12 5v14M5 12h14",
+  minus: "M6 12h12",
+  trash: "M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3",
+  grip: "M4 8h16M4 12h16M4 16h16",
+  more: "M7 12a1.6 1.6 0 11-3.2 0 1.6 1.6 0 013.2 0zm6.6 0a1.6 1.6 0 11-3.2 0 1.6 1.6 0 013.2 0zm6.6 0a1.6 1.6 0 11-3.2 0 1.6 1.6 0 013.2 0z",
+  chevronRight: "M9 5l7 7-7 7",
+  sort: "M7 4v16m0 0l-3-3m3 3l3-3M17 20V4m0 0l-3 3m3-3l3 3",
+  pencil: "M4 20h4L19 9a2.8 2.8 0 00-4-4L4 16v4z",
+  undo: "M9 14L4 9l5-5M4 9h10.5a5.5 5.5 0 010 11H11",
+  chart: "M4 4v16h16M8 15l3.5-4 3 2.5L20 7",
 } as const;
+
+/** Drawn filled rather than stroked. */
+const SOLID: ReadonlySet<IconName> = new Set<IconName>(["starFill", "more"]);
 
 export type IconName = keyof typeof PATHS;
 
@@ -24,8 +39,8 @@ export function Icon({ name, size = 16, className }: { name: IconName; size?: nu
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
+      fill={SOLID.has(name) ? "currentColor" : "none"}
+      stroke={SOLID.has(name) ? "none" : "currentColor"}
       strokeWidth={1.8}
       strokeLinecap="round"
       strokeLinejoin="round"

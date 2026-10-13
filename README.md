@@ -4,7 +4,8 @@ A stock scanner for the **S&P 500 and Nasdaq-100** (518 stocks). Pick a stock an
 you get a radar chart (one spoke per metric, so a stock's scores draw its shape),
 a score summary, callouts on what stands out, and every metric with the figure
 behind its score. Metrics 1–7 come from market data. Metrics 8–13 are judgement
-calls that **Claude** scores after researching the company on the web.
+calls that **Claude** scores after researching the company on the web. Keep
+the stocks you follow on a **watchlist** to compare them at a glance.
 
 Live at https://stocks-rank.vercel.app (behind Vercel's login).
 
@@ -70,6 +71,30 @@ The look is set by the design tokens in `src/styles/tokens.css`: light and
 dark themes that follow the system, Geist and Geist Mono (self-hosted), and the
 status colours green, amber and red, always shown alongside the number. All
 animation is switched off for people who set their system to reduce motion.
+Buttons, menus and sheets follow iOS conventions so the installed app feels
+native: filled, gray, tinted and plain buttons that dim when pressed, a
+segmented control for the index filter, pull-down menus, bottom sheets, action
+sheets for destructive choices, and a tab bar on phones.
+
+## The watchlist
+
+*Add to Watchlist* on a stock's page, or the **+** on the watchlist page, which
+opens a search sheet with popular picks. The list (`/watchlist`, or the
+*Watchlist* tab on phones) shows each stock's score shape, price and grade, with
+a bar of how many are Strong, Mixed and Weak.
+
+- **Grades** use the same rule as the stock page. They include Claude's six
+  scores when this browser has a cached analysis for the stock; otherwise the
+  row says *Market data only*, and the overview counts how many include Claude.
+- **Sort** by your order, score, symbol or most recently added (the **⋯** menu).
+- **Edit** to drag rows into your order (or use the arrow keys on a row's grip),
+  and tap ⊖ to delete. On touch screens, swipe a row left to delete it; a long
+  swipe deletes at once. Deleting shows *Undo*. *Clear Watchlist* asks first.
+- **Storage:** the list stays on this device (`localStorage`), up to 100 stocks.
+  Each row's market data comes from `/api/stock` and is saved with the list, so
+  it opens instantly and still shows offline, with its "as of" time. It is
+  fetched again when it's over 15 minutes old, when the app comes back to the
+  foreground or online, or on *Refresh Data*.
 
 ## How Claude scores metrics 8–13
 
@@ -172,7 +197,7 @@ Features hold their own logic, components and styles. `src/ui/` is a small
 design system that knows nothing about stocks.
 
 ```
-src/app/                       routes: / · /stock/[symbol] · /offline · /api/stock/[symbol] · /api/version
+src/app/                       routes: / · /stock/[symbol] · /watchlist · /offline · /api/stock/[symbol] · /api/version
 src/features/
   scoring/                     metric catalogue, thresholds and pure scoring rules (the spec lives here)
   market-data/                 fundamentals type + pure derivations; yahoo.ts does the I/O; report.ts caches (server only)
@@ -184,8 +209,16 @@ src/features/
   radar/                       radar geometry (pure, tested), the animated RadarChart, and the RadarGlyph mark
   pwa/                         service-worker registration, install/offline controls, the update notice,
                                the build id (version.ts) and the footer's version label
+  watchlist/                   watchlist.ts (list edits and sorting) and summary.ts (a row's grade), pure and tested;
+                               store.ts keeps the list and row data in the browser; components/ for the page,
+                               rows, the add sheet and the stock page's button
+  navigation/                  the phone tab bar and the header's watchlist link
+src/lib/                       format.ts (numbers and money); browser-storage.ts (guarded local/session storage
+                               that notifies subscribers, for useSyncExternalStore)
 src/ui/                        Panel, Button, Callout, ScorePill, Meter, Gauge, TierBar, CountUp, LocalTime,
-                               Skeleton, Icon, and the motion hooks (useTween, reduced-motion aware)
+                               Skeleton, Icon, the motion hooks (useTween, reduced-motion aware), and the
+                               iOS-style controls: Menu, Sheet + ActionSheet, SegmentedControl, SwipeActions,
+                               Toast, and useDragReorder
 src/styles/                    tokens.css (colours, type, radii for light and dark) and base.css
 public/sw.js                   service worker; public/manifest.webmanifest + public/icons/
 scripts/build-universe.mjs     regenerates src/features/universe/data/universe.json

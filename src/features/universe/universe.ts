@@ -18,6 +18,11 @@ export const UNIVERSE_DATE = universe.generatedAt;
 
 const bySymbol = new Map(STOCKS.map((s) => [s.symbol, s]));
 
+/** Well-known names to suggest before someone has searched. */
+export const POPULAR: Stock[] = ["NVDA", "AAPL", "MSFT", "AMZN", "GOOGL", "META", "COST", "JPM"]
+  .map((s) => bySymbol.get(s))
+  .filter((s) => s !== undefined);
+
 /** Looks a symbol up case-insensitively; accepts "BRK.B" for "BRK-B". */
 export function findStock(symbol: string): Stock | undefined {
   return bySymbol.get(symbol.trim().toUpperCase().replace(/\./g, "-"));

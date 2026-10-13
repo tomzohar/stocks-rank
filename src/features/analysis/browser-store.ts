@@ -1,7 +1,8 @@
 // Browser-side state for Claude's analysis: the viewer's API key and a
-// per-stock cache of finished analyses. Exposed as useSyncExternalStore
-// stores. Nothing here is ever sent to the stocks-rank server.
+// per-stock cache of finished analyses, kept with lib/browser-storage and read
+// through useSyncExternalStore. Nothing here is ever sent to the stocks-rank server.
 import { z } from "zod";
+import { notifyStorage, readStorage, subscribeStorage, writeStorageQuietly } from "@/lib/browser-storage";
 import { QUALITATIVE_METRIC_IDS } from "@/features/scoring/metrics";
 import { ANALYSIS_VERSION } from "./prompt";
 import type { AnalysisSubject, QualitativeAnalysis } from "./types";
@@ -57,80 +58,44 @@ export function parseStoredAnalysis(raw: string | null, nowMs: number): StoredAn
   }
 }
 
-// ---- storage (guarded: storage can be blocked, e.g. in private windows) ----
-
-const listeners = new Set<() => void>();
-const notify = () => listeners.forEach((l) => l());
-// Fallback when storage throws, so the session still works.
-const memory = new Map<string, string>();
-
-function read(storage: () => Storage, key: string): string | null {
-  try {
-    return storage().getItem(key);
-  } catch {
-    return memory.get(key) ?? null;
-  }
-}
-function write(storage: () => Storage, key: string, value: string | null) {
-  try {
-    if (value === null) storage().removeItem(key);
-    else storage().setItem(key, value);
-  } catch {
-    if (value === null) memory.delete(key);
-    else memory.set(key, value);
-  }
-}
-const local = () => window.localStorage;
-const session = () => window.sessionStorage;
-
-function onStorage(e: StorageEvent) {
-  if (e.key === null || e.key.startsWith("stocks-rank:")) notify();
-}
-
-export function subscribe(listener: () => void): () => void {
-  if (listeners.size === 0) window.addEventListener("storage", onStorage);
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-    if (listeners.size === 0) window.removeEventListener("storage", onStorage);
-  };
-}
+/** For useSyncExternalStore: fires when the key, a cached analysis or a run changes. */
+export const subscribe = subscribeStorage;
 
 // ---- API key ----
 
 /** The viewer's key: this tab's first, then one remembered on the device. */
 export function getApiKey(): string | null {
-  return read(session, KEY_STORAGE) ?? read(local, KEY_STORAGE);
+  return readStorage("session", KEY_STORAGE) ?? readStorage("local", KEY_STORAGE);
 }
 
 /** Session-only by default; `remember` keeps it on this device until forgotten. */
 export function setApiKey(key: string, remember: boolean) {
   forgetApiKey();
-  write(remember ? local : session, KEY_STORAGE, key.trim());
-  notify();
+  writeStorageQuietly(remember ? "local" : "session", KEY_STORAGE, key.trim());
+  notifyStorage();
 }
 
 export function forgetApiKey() {
-  write(session, KEY_STORAGE, null);
-  write(local, KEY_STORAGE, null);
-  notify();
+  writeStorageQuietly("session", KEY_STORAGE, null);
+  writeStorageQuietly("local", KEY_STORAGE, null);
+  notifyStorage();
 }
 
 // ---- analysis cache ----
 
 /** Raw cached entry for useSyncExternalStore (a stable string snapshot). */
 export function getStoredAnalysisRaw(symbol: string): string | null {
-  return read(local, analysisStorageKey(symbol));
+  return readStorage("local", analysisStorageKey(symbol));
 }
 
 export function storeAnalysis(symbol: string, analysis: QualitativeAnalysis) {
-  write(local, analysisStorageKey(symbol), JSON.stringify({ savedAt: Date.now(), analysis }));
-  notify();
+  writeStorageQuietly("local", analysisStorageKey(symbol), JSON.stringify({ savedAt: Date.now(), analysis }));
+  notifyStorage();
 }
 
 export function clearStoredAnalysis(symbol: string) {
-  write(local, analysisStorageKey(symbol), null);
-  notify();
+  writeStorageQuietly("local", analysisStorageKey(symbol), null);
+  notifyStorage();
 }
 
 // ---- running an analysis ----
@@ -156,9 +121,9 @@ export function runAnalysis(subject: AnalysisSubject, apiKey: string): Promise<v
     storeAnalysis(subject.symbol, analysis);
   })().finally(() => {
     inFlight.delete(subject.symbol);
-    notify();
+    notifyStorage();
   });
   inFlight.set(subject.symbol, run);
-  notify();
+  notifyStorage();
   return run;
 }

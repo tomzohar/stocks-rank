@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { StockFundamentals } from "@/features/market-data/fundamentals";
 import { INDEX_LABELS, type Stock } from "@/features/universe/universe";
 import { formatPrice } from "@/lib/format";
@@ -5,8 +6,16 @@ import { Callout } from "@/ui/Callout";
 import { LocalTime } from "@/ui/LocalTime";
 import styles from "./StockHeader.module.css";
 
-/** Ticker, name, sector, index membership and the latest price. */
-export function StockHeader({ stock, fundamentals: f }: { stock: Stock; fundamentals: StockFundamentals }) {
+/** Ticker, name, sector, index membership and the latest price, with room for actions. */
+export function StockHeader({
+  stock,
+  fundamentals: f,
+  actions,
+}: {
+  stock: Stock;
+  fundamentals: StockFundamentals;
+  actions?: ReactNode;
+}) {
   return (
     <header className={styles.header}>
       <div className={styles.identity}>
@@ -29,6 +38,7 @@ export function StockHeader({ stock, fundamentals: f }: { stock: Stock; fundamen
           <i className={styles.dot} aria-hidden="true" />
           Delayed quote · <LocalTime iso={f.asOf} />
         </span>
+        {actions && <div className={styles.actions}>{actions}</div>}
       </div>
       {f.source === "demo" && (
         <Callout tone="warning" className={styles.demo} title="Demo data">

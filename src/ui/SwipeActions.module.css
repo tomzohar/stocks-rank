@@ -1,0 +1,50 @@
+.swipe {
+  position: relative;
+  overflow: hidden;
+}
+.content {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  /* Vertical scrolling stays with the browser; horizontal moves are ours. */
+  touch-action: pan-y;
+  transition: transform 0.35s var(--ease-out);
+}
+.dragging {
+  transition: none;
+}
+.actions {
+  position: absolute;
+  inset: 0 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+}
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  flex: 0 0 80px;
+  min-width: 80px;
+  border: 0;
+  background: var(--text-muted);
+  color: #fff;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: flex-grow 0.2s var(--ease-out);
+}
+.destructive {
+  background: var(--critical);
+}
+.action:active {
+  filter: brightness(0.85);
+}
+@media (prefers-reduced-motion: reduce) {
+  .content,
+  .action {
+    transition: none;
+  }
+}

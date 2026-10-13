@@ -1,6 +1,9 @@
+import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { HeaderNav } from "@/features/navigation/HeaderNav";
+import { TabBar, TabBarView } from "@/features/navigation/TabBar";
 import { AppVersion } from "@/features/pwa/AppVersion";
 import { PwaControls } from "@/features/pwa/PwaControls";
 import { UpdateNotice } from "@/features/pwa/UpdateNotice";
@@ -51,6 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               </span>
             </Link>
             <StockPicker />
+            <HeaderNav />
             <PwaControls />
           </div>
         </header>
@@ -60,6 +64,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           investment advice.
           <AppVersion />
         </footer>
+        <Suspense fallback={<TabBarView pathname={null} />}>
+          <TabBar />
+        </Suspense>
         <UpdateNotice />
       </body>
     </html>

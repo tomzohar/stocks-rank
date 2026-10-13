@@ -10,8 +10,19 @@ body {
 html {
   -webkit-text-size-adjust: 100%;
 }
+:root {
+  /* Where fixed toasts sit: above the home indicator, or the tab bar on phones. */
+  --toast-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+@media (max-width: 700px) {
+  :root {
+    --tabbar-h: calc(3.25rem + env(safe-area-inset-bottom));
+    --toast-bottom: calc(var(--tabbar-h) + 0.75rem);
+  }
+}
 body {
   min-height: 100dvh;
+  padding-bottom: var(--tabbar-h);
   background: var(--bg);
   color: var(--text-primary);
   font-family: var(--font);

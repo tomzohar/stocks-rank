@@ -2,7 +2,7 @@
   position: fixed;
   z-index: 50;
   left: 50%;
-  bottom: max(1rem, env(safe-area-inset-bottom));
+  bottom: var(--toast-bottom);
   display: flex;
   align-items: center;
   flex-wrap: wrap;

@@ -4,6 +4,7 @@ import { getStockReport, type StockReport } from "@/features/market-data/report"
 import { Scorecard } from "@/features/scorecard/components/Scorecard";
 import { StockHeader } from "@/features/scorecard/components/StockHeader";
 import { findStock } from "@/features/universe/universe";
+import { WatchButton } from "@/features/watchlist/components/WatchButton";
 import { Callout } from "@/ui/Callout";
 import { Panel } from "@/ui/Panel";
 import { Skeleton } from "@/ui/Skeleton";
@@ -38,7 +39,7 @@ async function Report({ params }: { params: PageProps<"/stock/[symbol]">["params
   // Claude's scores (metrics 8–13) are fetched in the browser with the viewer's own key.
   return (
     <div className={`${styles.report} reveal`}>
-      <StockHeader stock={stock} fundamentals={report.fundamentals} />
+      <StockHeader stock={stock} fundamentals={report.fundamentals} actions={<WatchButton symbol={stock.symbol} />} />
       <Scorecard stock={stock} {...report} />
     </div>
   );

@@ -1,0 +1,75 @@
+.control {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  padding: 2px;
+  border-radius: 9px;
+  background: var(--fill);
+  isolation: isolate;
+}
+.thumb {
+  position: absolute;
+  z-index: -1;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  width: calc((100% - 4px) / var(--n));
+  border-radius: 7px;
+  background: var(--surface);
+  box-shadow:
+    0 3px 8px rgb(0 0 0 / 0.12),
+    0 3px 1px rgb(0 0 0 / 0.04),
+    0 0 0 0.5px rgb(0 0 0 / 0.04);
+  transform: translateX(calc(var(--i) * 100%));
+  transition: transform 0.32s var(--ease-spring);
+}
+.segment {
+  position: relative;
+  min-height: 1.85rem;
+  padding: 0.2rem 0.7rem;
+  border: 0;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.2s;
+}
+/* A hairline between unselected neighbours. */
+.segment + .segment::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 25%;
+  bottom: 25%;
+  width: 1px;
+  background: var(--border-strong);
+  transition: opacity 0.2s;
+}
+.segment[aria-checked="true"]::before,
+.segment[aria-checked="true"] + .segment::before {
+  opacity: 0;
+}
+.segment[aria-checked="true"] {
+  font-weight: 600;
+}
+.segment:active:not([aria-checked="true"]) {
+  opacity: 0.5;
+}
+.segment:focus-visible {
+  outline-offset: -2px;
+  border-radius: 7px;
+}
+@media (pointer: coarse) {
+  .segment {
+    min-height: 2.1rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .thumb {
+    transition: none;
+  }
+}
