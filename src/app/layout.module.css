@@ -42,9 +42,11 @@
   font-size: 0.75rem;
   color: var(--text-muted);
 }
-/* On phones the header wraps to three rows; let it scroll away instead of covering the page. */
+/* On phones the header wraps to three rows; let it scroll away instead of
+   covering the page. Still positioned, so its z-index keeps the search
+   dropdown above the page. */
 @media (max-width: 700px) {
   .header {
-    position: static;
+    position: relative;
   }
 }
