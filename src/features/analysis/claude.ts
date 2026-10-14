@@ -12,6 +12,9 @@ import {
   parseSubmission,
 } from "./prompt";
 import type { AnalysisSubject, QualitativeAnalysis } from "./types";
+import { AnalysisError } from "./analysis-error";
+
+export { AnalysisError };
 
 type BetaMessage = Anthropic.Beta.BetaMessage;
 type BetaContentBlock = Anthropic.Beta.BetaContentBlock;
@@ -22,8 +25,6 @@ type StreamParams = Parameters<Anthropic["beta"]["messages"]["stream"]>[0];
 export interface MessagesClient {
   beta: { messages: { stream(params: StreamParams): { finalMessage(): Promise<BetaMessage> } } };
 }
-
-export class AnalysisError extends Error {}
 
 /** Server-tool pauses and the one "please submit" nudge, together. */
 const MAX_REQUESTS = 4;

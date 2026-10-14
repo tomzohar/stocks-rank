@@ -58,6 +58,25 @@
   color: var(--series);
 }
 
+.build {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 0.5px solid var(--border);
+}
+.build > span {
+  display: grid;
+  gap: 0.1rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+.build strong {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
 /* Inset grouped list. */
 .list {
   margin: 0;

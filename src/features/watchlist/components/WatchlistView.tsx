@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { findStock, POPULAR } from "@/features/universe/universe";
 import { Button } from "@/ui/Button";
@@ -49,6 +50,8 @@ export function WatchlistView() {
 }
 
 function List({ entries, onAdd }: { entries: WatchlistEntry[]; onAdd: () => void }) {
+  const router = useRouter();
+  const buildPortfolio = () => router.push("/portfolios/new");
   const [sort, setSort] = useWatchlistSort();
   const [editing, setEditing] = useState(false);
   const [openRow, setOpenRow] = useState<string | null>(null);
@@ -136,6 +139,7 @@ function List({ entries, onAdd }: { entries: WatchlistEntry[]; onAdd: () => void
                         icon: "refresh",
                         onSelect: () => void refreshQuotes(symbols, { force: true }),
                       },
+                      { id: "portfolio", label: "Build Portfolio", icon: "pie", onSelect: buildPortfolio },
                     ],
                   },
                   {
@@ -175,6 +179,15 @@ function List({ entries, onAdd }: { entries: WatchlistEntry[]; onAdd: () => void
               ? "Every grade includes Claude's six judgement scores."
               : `${withClaude} of ${entries.length} include Claude's judgement scores; the rest are graded on market data. Open a stock to score it.`}
           </p>
+          <div className={styles.build}>
+            <span>
+              <strong>Build a portfolio</strong>
+              Pick stocks from this list, set a monthly amount, and let Claude propose the split.
+            </span>
+            <Button variant="tinted" size="sm" icon="pie" onClick={buildPortfolio}>
+              Build
+            </Button>
+          </div>
         </section>
 
         <ul className={styles.list} style={{ "--i": 2 } as React.CSSProperties}>

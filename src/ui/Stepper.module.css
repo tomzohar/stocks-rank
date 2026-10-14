@@ -1,0 +1,68 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+}
+.text {
+  display: grid;
+  flex: 1;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.label {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}
+.detail {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+.value {
+  min-width: 2.5rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+/* A gray capsule split in two, like UIStepper. */
+.buttons {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  border-radius: 9px;
+  background: var(--fill);
+}
+.buttons button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.9rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.2s;
+}
+.buttons button:active:not(:disabled) {
+  opacity: 0.4;
+  transition-duration: 0s;
+}
+.buttons button:disabled {
+  color: var(--text-muted);
+  opacity: 0.45;
+  cursor: default;
+}
+.buttons button:focus-visible {
+  outline-offset: -2px;
+  border-radius: 9px;
+}
+.divider {
+  width: 1px;
+  height: 1.1rem;
+  background: var(--border-strong);
+}

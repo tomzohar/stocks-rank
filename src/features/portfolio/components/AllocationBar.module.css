@@ -1,0 +1,27 @@
+.bar {
+  display: flex;
+  gap: 2px;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: var(--fill);
+  overflow: hidden;
+}
+.segment {
+  flex-basis: 0;
+  min-width: 3px;
+  background: color-mix(in srgb, var(--series) var(--shade), var(--surface-sunken));
+  transition: flex-grow 0.35s var(--ease-out);
+}
+.dot {
+  display: inline-block;
+  flex: none;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--series) var(--shade), var(--surface-sunken));
+}
+@media (prefers-reduced-motion: reduce) {
+  .segment {
+    transition: none;
+  }
+}

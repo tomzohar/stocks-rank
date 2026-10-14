@@ -1,0 +1,199 @@
+.headActions {
+  display: flex;
+  gap: 0.25rem;
+}
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+.fieldLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.controls {
+  display: grid;
+}
+.controls > * + * {
+  border-top: 0.5px solid var(--border);
+}
+.textarea {
+  width: 100%;
+  min-height: 3.6rem;
+  padding: 0.55rem 0.7rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--fill);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  resize: vertical;
+  field-sizing: content;
+  outline: none;
+}
+.textarea:focus {
+  box-shadow: 0 0 0 2px var(--series-fill);
+}
+.askRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+.hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.count {
+  margin-left: 0.25rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  background: var(--fill);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  vertical-align: 0.1em;
+}
+
+/* Inset grouped rows. */
+.list {
+  margin: 0 -1rem;
+  padding: 0;
+  list-style: none;
+  border-top: 0.5px solid var(--border);
+}
+.list:last-child {
+  margin-bottom: -1rem;
+}
+.list > li + li {
+  border-top: 0.5px solid var(--border);
+}
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  min-height: 3.4rem;
+  padding: 0.5rem 1rem;
+  border: 0;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+}
+li.row {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+button.row {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+button.row:hover {
+  background: color-mix(in srgb, var(--fill) 50%, transparent);
+}
+button.row:active {
+  background: var(--fill);
+}
+button.row:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+button.row:focus-visible {
+  outline-offset: -2px;
+}
+.list > li:last-child .row {
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+.glyph {
+  display: inline-flex;
+}
+.ident {
+  display: grid;
+  min-width: 0;
+}
+.symbol {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+.name {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+.grade {
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--fill);
+  font-size: 0.76rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+.grade b {
+  font-variant-numeric: tabular-nums;
+}
+.good {
+  background: color-mix(in srgb, var(--good) 15%, transparent);
+  color: var(--good);
+}
+.warning {
+  background: color-mix(in srgb, var(--warning) 20%, transparent);
+  color: color-mix(in srgb, var(--warning) 70%, var(--text-primary));
+}
+.critical {
+  background: color-mix(in srgb, var(--critical) 14%, transparent);
+  color: var(--critical);
+}
+/* An iOS checkmark circle. */
+.check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 50%;
+  color: #fff;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+}
+.on {
+  border-color: var(--series);
+  background: var(--series);
+}
+
+.excluded summary {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.excluded summary span {
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  background: var(--fill);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+.reasons {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+}
+.reasons b {
+  display: inline-block;
+  min-width: 4rem;
+  font-family: var(--mono);
+  color: var(--text-primary);
+}

@@ -18,6 +18,7 @@ interface Tab {
 const TABS: Tab[] = [
   { href: "/", label: "Stocks", icon: "chart", matches: (p) => p === "/" || p.startsWith("/stock/") },
   { href: "/watchlist", label: "Watchlist", icon: "star", activeIcon: "starFill", matches: (p) => p.startsWith("/watchlist") },
+  { href: "/portfolios", label: "Portfolios", icon: "pie", activeIcon: "pieFill", matches: (p) => p.startsWith("/portfolios") },
 ];
 
 /** The phone tab bar. Wrap in Suspense: the pathname isn't known while prerendering a stock page. */

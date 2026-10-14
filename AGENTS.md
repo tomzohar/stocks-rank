@@ -23,8 +23,9 @@ and the architecture.
 - **Styling:** CSS modules next to each component; colours only from the
   tokens in `src/styles/tokens.css`, in both themes; respect reduced motion.
   Controls follow iOS conventions: reuse `Button`, `Menu`, `Sheet`/`ActionSheet`,
-  `SegmentedControl`, `TabLinks`, `SwipeActions` and `Toast` from `src/ui/` before adding new ones.
-- **Browser state** (the API key, Claude's cache, the watchlist, average buy prices) goes through
+  `SegmentedControl`, `TabLinks`, `SwipeActions`, `Switch`, `Stepper` and `Toast` from `src/ui/` before adding new ones.
+- **Browser state** (the API key, Claude's cache, the watchlist, average buy prices, portfolios
+  and the builder's draft) goes through
   `src/lib/browser-storage.ts`, keys prefixed `stocks-rank:`, read with
   `useSyncExternalStore`. Anything a swipe does must also be reachable by
   keyboard or mouse.
@@ -33,8 +34,12 @@ and the architecture.
 - **Charts:** price charts use TradingView Lightweight Charts (`lightweight-charts`)
   through `features/dca/components/PriceChart.tsx`. Keep its attribution logo on
   (the licence asks for it), and pass colours resolved from the tokens.
+- **Claude calls** all run in the browser with the viewer's key and answer
+  through a strict submit tool that is validated, never executed: scoring in
+  `features/analysis/`, picks and proposals in `features/portfolio/`. Load the
+  SDK with a dynamic `import()` so it stays out of page bundles.
 - **Version bumps:** `ANALYSIS_VERSION` in `features/analysis/prompt.ts` when
   the prompt changes; `VERSION` in `public/sw.js` when caching changes.
 - **Keep the README in step** with any change to metrics, thresholds, the page,
-  the watchlist, the DCA rules, the Claude flow, the PWA, or the layout.
+  the watchlist, the DCA rules, portfolios, the Claude flow, the PWA, or the layout.
 

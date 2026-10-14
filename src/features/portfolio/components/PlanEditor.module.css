@@ -1,0 +1,337 @@
+.editor {
+  display: grid;
+  gap: 1rem;
+}
+
+/* Inset grouped card, like the watchlist's. */
+.card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2rem;
+}
+.cardHead h2 {
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.headActions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+/* The name reads as a title until you tap it. */
+.name {
+  width: 100%;
+  min-width: 0;
+  margin: -0.2rem -0.35rem 0;
+  padding: 0.2rem 0.35rem;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  outline: none;
+}
+.name:hover {
+  background: color-mix(in srgb, var(--fill) 50%, transparent);
+}
+.name:focus {
+  background: var(--fill);
+}
+.source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  margin: -0.5rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.source svg {
+  color: var(--series);
+}
+.amounts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.block {
+  display: grid;
+  gap: 0.35rem;
+}
+.blockLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+/* Text that's editable in place: plain until hovered or focused. */
+.note {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.2rem;
+  padding: 0.45rem 0.55rem;
+  border: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--fill) 45%, transparent);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  resize: vertical;
+  field-sizing: content;
+  outline: none;
+}
+.note:focus {
+  background: var(--fill);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 2px var(--series-fill);
+}
+.note::placeholder {
+  color: var(--text-muted);
+}
+
+.weightBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 2rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.off strong {
+  color: var(--critical);
+}
+
+.holdings,
+.buys,
+.tips {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.holdings {
+  display: grid;
+}
+.holding {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.75rem 0;
+}
+.holding + .holding {
+  border-top: 0.5px solid var(--border-strong);
+}
+.holding:last-child {
+  padding-bottom: 0;
+}
+.out .ident,
+.out .money {
+  opacity: 0.55;
+}
+.holdingHead {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.ident {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+.symbol {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.symbol:hover {
+  color: var(--series);
+}
+.company {
+  overflow: hidden;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.weight {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0 0.55rem;
+  border-radius: 9px;
+  background: var(--fill);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.weight:focus-within {
+  box-shadow: 0 0 0 2px var(--series-fill);
+}
+.weight input {
+  width: 3.2rem;
+  min-height: 2.1rem;
+  border: 0;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  outline: none;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.weight input::-webkit-inner-spin-button,
+.weight input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.holdingMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding-left: 1.15rem;
+}
+.role select {
+  min-height: 1.8rem;
+  padding: 0 1.6rem 0 0.6rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent-soft)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%23888' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E")
+    no-repeat right 0.6rem center;
+  color: var(--series);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  appearance: none;
+  cursor: pointer;
+}
+.money {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.money strong {
+  color: var(--text-primary);
+}
+.holding .note {
+  margin-left: 1.15rem;
+  width: calc(100% - 1.15rem);
+}
+.empty {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.lede {
+  margin: -0.4rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.buys {
+  display: grid;
+}
+.buys li {
+  display: grid;
+  grid-template-columns: auto 4.2rem minmax(0, 1fr) auto 5.2rem;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.5rem;
+  font-size: 0.85rem;
+}
+.buys li + li {
+  border-top: 0.5px solid var(--border);
+}
+.buySymbol {
+  font-family: var(--mono);
+  font-weight: 650;
+}
+.buyWhy {
+  overflow: hidden;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chip {
+  min-width: 2.4rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: var(--fill);
+  font-size: 0.74rem;
+  font-weight: 650;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+.up {
+  background: color-mix(in srgb, var(--good) 16%, transparent);
+  color: var(--good);
+}
+.down {
+  background: color-mix(in srgb, var(--warning) 20%, transparent);
+  color: color-mix(in srgb, var(--warning) 70%, var(--text-primary));
+}
+.buyAmount {
+  font-weight: 650;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.buys .buyTotal {
+  grid-template-columns: 1fr auto;
+  font-weight: 650;
+}
+
+.tips {
+  display: grid;
+  gap: 0.5rem;
+  counter-reset: tip;
+}
+.tips li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  counter-increment: tip;
+}
+.tips li::before {
+  content: counter(tip);
+  flex: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  margin-top: 0.4rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--series);
+  font-size: 0.74rem;
+  font-weight: 650;
+  line-height: 1.4rem;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .buys li {
+    grid-template-columns: auto 3.6rem minmax(0, 1fr) auto 4.4rem;
+    gap: 0.4rem;
+  }
+}

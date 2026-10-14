@@ -1,0 +1,165 @@
+/* Step indicator: numbered dots joined by a line; earlier steps are tappable. */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0.85rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.steps li {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+.steps li + li::before {
+  content: "";
+  position: absolute;
+  top: 0.8rem;
+  right: calc(50% + 1.1rem);
+  left: calc(-50% + 1.1rem);
+  height: 2px;
+  border-radius: 1px;
+  background: var(--border-strong);
+}
+.steps li.done + li::before,
+.steps li.done + li.current::before {
+  background: var(--series);
+}
+.steps button {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 500;
+  -webkit-tap-highlight-color: transparent;
+}
+.steps button:not(:disabled) {
+  cursor: pointer;
+}
+.steps button:disabled {
+  cursor: default;
+}
+.dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  font-size: 0.78rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.current button {
+  color: var(--text-primary);
+  font-weight: 650;
+}
+.current .dot {
+  border-color: var(--series);
+  background: var(--series);
+  color: #fff;
+  box-shadow: 0 0 0 4px var(--series-fill);
+}
+.done button {
+  color: var(--series);
+}
+.done .dot {
+  border-color: var(--series);
+  color: var(--series);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: -0.35rem;
+}
+.chips button {
+  min-height: 1.9rem;
+  padding: 0.2rem 0.8rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fill);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.chips button[aria-pressed="true"] {
+  background: var(--series);
+  color: #fff;
+}
+.textarea {
+  width: 100%;
+  min-height: 3.6rem;
+  padding: 0.55rem 0.7rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--fill);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  resize: vertical;
+  field-sizing: content;
+  outline: none;
+}
+.textarea:focus {
+  box-shadow: 0 0 0 2px var(--series-fill);
+}
+.symbols {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.symbols li {
+  padding: 0.2rem 0.55rem;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--series);
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+.createRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+.createRow > span {
+  flex: 1;
+  text-align: left;
+}
+.again {
+  display: flex;
+  justify-content: center;
+}
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 12px;
+  background: var(--series);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.linkButton:active {
+  opacity: 0.55;
+}

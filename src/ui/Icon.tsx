@@ -26,10 +26,12 @@ const PATHS = {
   pencil: "M4 20h4L19 9a2.8 2.8 0 00-4-4L4 16v4z",
   undo: "M9 14L4 9l5-5M4 9h10.5a5.5 5.5 0 010 11H11",
   chart: "M4 4v16h16M8 15l3.5-4 3 2.5L20 7",
+  pie: "M10.5 4.6a8 8 0 108.9 8.9H10.5V4.6zM14 3a7.5 7.5 0 017 7h-7V3z",
+  pieFill: "M10.5 4.6a8 8 0 108.9 8.9H10.5V4.6zM14 3a7.5 7.5 0 017 7h-7V3z",
 } as const;
 
 /** Drawn filled rather than stroked. */
-const SOLID: ReadonlySet<IconName> = new Set<IconName>(["starFill", "more"]);
+const SOLID: ReadonlySet<IconName> = new Set<IconName>(["starFill", "pieFill", "more"]);
 
 export type IconName = keyof typeof PATHS;
 

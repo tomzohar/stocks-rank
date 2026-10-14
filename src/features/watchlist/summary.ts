@@ -60,6 +60,8 @@ export interface StockSummary {
   grade: Grade | null;
   /** Whether Claude's six scores are included. */
   claudeScored: boolean;
+  /** Each metric's score, null where there is none. */
+  scores: Scores;
   /** All 13 scores in metric order, unscored as 0, for the mini radar. */
   shape: number[];
   demo: boolean;
@@ -82,6 +84,7 @@ export function summarizeStock(quote: QuoteSnapshot, analysis: QualitativeAnalys
     total,
     grade: gradeFor(total.ratio),
     claudeScored: analysis !== null,
+    scores,
     shape: METRICS.map((m) => scores[m.id] ?? 0),
     demo: quote.fundamentals.source === "demo",
   };
