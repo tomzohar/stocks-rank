@@ -64,7 +64,7 @@ export function ApiKeyForm({ submitLabel = "Use key" }: { submitLabel?: string }
       )}
       <p id={`${id}-help`} className={styles.help}>
         Your key stays in this browser ({remember ? "until you forget it" : "until you close this tab"}) and is sent only
-        to Anthropic. It never reaches the stocks-rank server. Each analysis is billed to your Anthropic account. Create
+        to Anthropic. It never reaches the stocks-rank server. Each request to Claude is billed to your Anthropic account. Create
         a key in the{" "}
         <a href="https://platform.claude.com" target="_blank" rel="noopener noreferrer">
           Claude Console

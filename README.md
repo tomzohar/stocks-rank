@@ -80,7 +80,9 @@ animation is switched off for people who set their system to reduce motion.
 Buttons, menus and sheets follow iOS conventions so the installed app feels
 native: filled, gray, tinted and plain buttons that dim when pressed, a
 segmented control for the index filter, pull-down menus, bottom sheets, action
-sheets for destructive choices, and a tab bar on phones.
+sheets for destructive choices, switches and steppers, and a tab bar on phones
+(*Stocks*, *Watchlist*, *Portfolios*). On wider screens the header links to
+the watchlist and portfolios instead.
 
 ## The DCA chart
 
@@ -131,6 +133,7 @@ a bar of how many are Strong, Mixed and Weak.
   scores when this browser has a cached analysis for the stock; otherwise the
   row says *Market data only*, and the overview counts how many include Claude.
 - **Sort** by your order, score, symbol or most recently added (the **⋯** menu).
+- **Build** in the overview starts a [portfolio](#portfolios) from the list.
 - **Edit** to drag rows into your order (or use the arrow keys on a row's grip),
   and tap ⊖ to delete. On touch screens, swipe a row left to delete it; a long
   swipe deletes at once. Deleting shows *Undo*. *Clear Watchlist* asks first.
@@ -142,56 +145,84 @@ a bar of how many are Strong, Mixed and Weak.
 
 ## Portfolios
 
-*Build* on the watchlist (or *Build Portfolio* in its **⋯** menu) opens a
-three-step builder at `/portfolios/new`. Saved portfolios are in the
-**Portfolios** tab (`/portfolios`), each at `/portfolios/<id>`.
+*Build* in the watchlist overview (or *Build Portfolio* in its **⋯** menu)
+opens a three-step builder at `/portfolios/new`. Saved portfolios are in the
+**Portfolios** tab (`/portfolios`), each at `/portfolios/<id>`. The builder
+needs at least one stock on the watchlist.
 
-1. **Stocks**, from your watchlist, chosen one of three ways:
-   - **By Hand:** tick them.
-   - **By Rules:** a minimum grade (Any, Mixed or better, Strong), optional
+1. **Stocks**, from your watchlist (up to 25), chosen one of three ways:
+   - **By Hand:** tick them, or *All* / *None*.
+   - **By Rules:** a minimum grade (*Any*, *Mixed+* or *Strong*), optional
      must-haves (more cash than debt, revenue growing 10%+, 10+ points ahead
-     of the S&P 500 over 5 years, scored by Claude), a cap on how many and on
-     how many per sector. The best scores that pass are picked, and every
-     stock left out says why.
-   - **Claude Picks:** choose a goal (Balanced, Growth or Defensive), how many
-     (or let Claude decide) and an optional note. Claude reads each stock's
-     scorecard and picks a diversified set, with a reason for each.
+     of the S&P 500 over 5 years, scored by Claude), how many at most
+     (default 10) and how many per sector (default 3, or *Any*). The best
+     scores that pass are picked, and *Left out* lists every other stock
+     with the reason.
+   - **Claude Picks:** choose a goal (*Balanced*, *Growth* or *Defensive*),
+     how many (or *Claude decides*) and an optional note, then *Ask Claude to
+     Pick*. Claude reads each stock's scorecard and picks a diversified set,
+     with a reason for each. It waits until the watchlist's market data has
+     loaded.
 
-   *Adjust by Hand* turns the rules' or Claude's choice into a hand-picked list.
-2. **Amounts:** the monthly DCA amount (required) and a starting amount (0 is
-   fine), plus an optional note for Claude about your horizon or constraints.
-3. **Proposal:** Claude proposes a whole-percent weight and a role (Core,
-   Growth, Defensive or Satellite) for every stock, with a reason. It also
-   writes a plan for the starting amount, tips for splitting the monthly
-   amount, a name and a summary. **Everything is editable**: name, amounts,
-   weights (*Balance to 100%* fixes the total), roles, notes, the starting
-   plan, and the tips (add or remove). *Split by Score Instead* builds the
-   plan without Claude, weighting each stock by its score. *Save* stores the
-   portfolio.
+   *Adjust by Hand* turns the rules' or Claude's choice into a hand-picked
+   list you can change.
+2. **Amounts:** the monthly DCA amount (required; quick picks of $250 to
+   $2,000) and a starting amount (0 is fine), with the first year's total.
+   With a key, you can add a note for Claude about your horizon, risk or what
+   you already own. *Create Proposal* asks Claude.
+3. **Proposal:** Claude proposes a whole-percent weight and a role (*Core*,
+   *Growth*, *Defensive* or *Satellite*) for every stock, with a reason. It
+   also writes a plan for the starting amount, three to five tips for
+   splitting the monthly amount, a name and a summary.
+   - **Everything is editable:** the name, both amounts, weights (*Balance to
+     100%* rounds them to whole percents that add up), roles, each holding's
+     note, the starting plan, the summary and the tips. Add a holding from
+     your watchlist with **+**, remove one with **×**, and add or remove tips.
+     The tips are plain text, so they keep the dollar figures they were
+     written with if you change the amounts.
+   - *Split by Score Instead* builds the plan without Claude: each stock is
+     weighted by its share of available points (unscored stocks count as 40%),
+     with a role from its grade and tips built from the DCA rules.
+   - *Ask Claude Again* replaces the proposal, after asking, since your edits
+     go with it.
+   - *Save* stores the portfolio and opens the Portfolios tab.
+
+   Going back is safe: changing the stocks drops the proposal, since it no
+   longer fits; changing only the amounts keeps it and updates its amounts.
 
 - **This month** (in the proposal and on a saved portfolio) applies the DCA
   chart's buy rules to each holding's latest close: 2× for a stock 20% or
-  more under its 52-week high, 0.5× after a 20% month. *Keep the month at
-  $X* scales the other buys so the total stays at your monthly amount.
-  Readings come from `GET /api/stock/:symbol/dca` and are kept for an hour.
+  more under its 52-week high, 0.5× after a 20% month, 1× when there's no
+  reading. *Keep the month at $X* (on by default) scales the other buys so
+  the total stays at your monthly amount; off, the buys follow the rules
+  exactly and the total says how far over or under it is. Readings come from
+  `GET /api/stock/:symbol/dca` and are fetched again after an hour.
 - **Dollar amounts** follow the weights: each holding gets its share of the
   monthly and starting amounts, in cents that add up exactly. Weights that
-  don't add up to 100 are treated as proportions.
-- **Claude's two calls** run in your browser with your key, like the scoring:
-  Opus 5.5 at `medium` effort, no web search, answering through strict
-  `submit_picks` / `submit_portfolio` tools whose symbols are limited to your
-  stocks. The app keeps only stocks you offered, fills in any Claude skipped
-  at 0%, and rebalances weights to 100. Each call is billed to your key. On
-  demo data, both steps use the score-based versions, labelled as demo.
+  don't add up to 100 are treated as proportions, and a 0% holding is shown
+  as left out.
+- **A saved portfolio** (`/portfolios/<id>`) is editable the same way.
+  *Save* and *Discard* appear once you change something; the **⋯** menu
+  has *Duplicate* and *Delete Portfolio* (which asks first).
+- **Claude's two calls** run in your browser with your key, like the scoring.
+  Each is one Opus 5.5 request at `medium` effort with no web search,
+  answering through a strict tool (`submit_picks`, `submit_portfolio`) whose
+  symbols are limited to the stocks offered. Claude gets each stock's name,
+  sector, price, grade and 13 scores, plus (for the proposal) its DCA reading,
+  your amounts and your note. The app keeps only stocks you offered, adds any
+  Claude skipped at 0%, and rebalances the weights to 100. Each call is billed
+  to your key, and nothing is cached by prompt version: a finished proposal
+  lives in the draft until you save it. On demo data, both steps use the
+  score-based versions, labelled as demo, and need no key.
 - **Storage:** the draft lives in this tab (`sessionStorage`), so a reload
-  keeps your place and a finished proposal. Saved portfolios stay on this
-  device (`localStorage`), up to 50. Open one to edit it and *Save*,
-  *Duplicate* or *Delete* it.
+  keeps your place and a finished proposal; *Start Over* in the **⋯** menu
+  clears it. Saved portfolios stay on this device (`localStorage`), up to 50,
+  and aren't synced anywhere. DCA readings are kept in `localStorage` too.
 
 ## How Claude scores metrics 8–13
 
-On a stock's page you're asked for **your own Claude API key**. Then, in your
-browser, Claude Opus 5.5 (`claude-opus-5-5`) gets the rubric above. It checks
+On a stock's page you're asked for **your own Claude API key** (the portfolio
+builder asks for the same key, stored the same way). Then, in your browser, Claude Opus 5.5 (`claude-opus-5-5`) gets the rubric above. It checks
 recent facts with web search (the current CEO, leadership changes, layoffs,
 scandals), then answers by calling a strict `submit_scores` tool. The app
 validates the answer: every metric must be present, and each score must be
@@ -222,7 +253,8 @@ enabled for your organization in the Claude Console. If a safety classifier
 declines, the request falls back server-side to Anthropic's recommended model
 (`fallbacks: "default"`), and the page names the model that answered. After
 changing the prompt, bump `ANALYSIS_VERSION` in `src/features/analysis/prompt.ts` so
-cached analyses are redone.
+cached analyses are redone. Portfolio picks and proposals don't use web
+search, so they work without it (see [Portfolios](#portfolios)).
 
 ## Installing it (PWA)
 
@@ -254,8 +286,8 @@ A new deploy reaches an installed app in one of three ways:
    a client-side navigation across a deploy turns into a full reload.
 3. **Staying on one page:** the app re-checks when it returns to the
    foreground, comes back online, or every 15 minutes, and shows *New version
-   available · Reload*. Reload waits while Claude is mid-analysis, so a paid
-   run isn't thrown away.
+   available · Reload*. Reload waits while Claude is scoring, picking stocks or
+   writing a proposal, so a paid run isn't thrown away.
 
 Each build bakes in an id (Vercel's deployment id, or the git commit locally)
 that `/api/version` also reports; the notice shows when the two differ. The
@@ -299,13 +331,15 @@ src/features/
                                report.ts caches the report and the price history (server only)
   universe/                    S&P 500 ∪ Nasdaq-100 list, search, and the StockPicker
   analysis/                    Claude scoring: prompt + tool schema (prompt.ts), API loop (claude.ts),
-                               browser key + cache (browser-store.ts), hook and status/summary components
+                               browser key + cache (browser-store.ts), error wording shared by every Claude
+                               call (errors.ts, analysis-error.ts), hook, key form and status/summary components
   scorecard/                   model.ts turns data + scores into rows, meters, totals and callouts (pure, tested);
                                presenters.ts says how each market metric is shown; components/ render the page
   radar/                       radar geometry (pure, tested), the animated RadarChart, and the RadarGlyph mark
   pwa/                         service-worker registration, install/offline controls, the update notice,
                                the build id (version.ts) and the footer's version label
-  watchlist/                   watchlist.ts (list edits and sorting) and summary.ts (a row's grade), pure and tested;
+  watchlist/                   watchlist.ts (list edits and sorting) and summary.ts (a row's grade and scores),
+                               pure and tested;
                                store.ts keeps the list and row data in the browser; components/ for the page,
                                rows, the add sheet and the stock page's button
   dca/                         the DCA rules (rules.ts), rolling 52-week high and monthly change (series.ts),
@@ -315,7 +349,8 @@ src/features/
   portfolio/                   model.ts (weights, money splits, storage), candidates.ts (selection rules),
                                monthly.ts (this month's buys), prompt.ts + claude.ts (Claude's picks and proposal),
                                heuristic.ts (the no-Claude versions), all pure and tested; store.ts keeps the draft,
-                               saved portfolios, runs and readings; components/ for the builder, editor and lists
+                               saved portfolios, Claude runs and DCA readings; components/ for the builder and
+                               its steps, the plan editor, the list and a saved portfolio's page
   navigation/                  the phone tab bar and the header's watchlist and portfolios links
 src/lib/                       format.ts (numbers and money); browser-storage.ts (guarded local/session storage
                                that notifies subscribers, for useSyncExternalStore)
