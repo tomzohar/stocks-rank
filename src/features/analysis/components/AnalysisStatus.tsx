@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import type { AnalysisState } from "@/features/analysis/types";
 import { Button } from "@/ui/Button";
 import { Callout } from "@/ui/Callout";
 import { ApiKeyForm } from "./ApiKeyForm";
 
 /** Says plainly what's happening with Claude's metrics until its scores are in. */
-export function AnalysisStatus({ analysis, onRetry }: { analysis: AnalysisState; onRetry: () => void }) {
+export function AnalysisStatus({ analysis, symbol, onRetry }: { analysis: AnalysisState; symbol: string; onRetry: () => void }) {
   switch (analysis.status) {
     case "ready":
     case "checking":
@@ -49,7 +50,9 @@ export function AnalysisStatus({ analysis, onRetry }: { analysis: AnalysisState;
             )
           }
         >
-          <p>{analysis.message}</p>
+          <p>
+            {analysis.message} <Link href={`/claude-log?subject=${encodeURIComponent(symbol)}`}>See the run log</Link>
+          </p>
           {analysis.keyRejected && <ApiKeyForm submitLabel="Use this key instead" />}
         </Callout>
       );

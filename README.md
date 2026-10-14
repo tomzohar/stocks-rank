@@ -256,6 +256,38 @@ changing the prompt, bump `ANALYSIS_VERSION` in `src/features/analysis/prompt.ts
 cached analyses are redone. Portfolio picks and proposals don't use web
 search, so they work without it (see [Portfolios](#portfolios)).
 
+## The Claude log
+
+Every Claude run, whether scoring, stock picks or a portfolio proposal, is
+logged, so a thin answer can be traced to its cause. Open it from the
+watchlist's **⋯** menu (*Claude Log*), from *Run log* under a stock's Claude
+summary, or from *See the run log* on a failed run (`/claude-log`;
+`?subject=AAPL` shows one stock).
+
+- **What a run shows:** each request's model, stop reason and time; tokens in
+  and out; and every web search with its query and either its result count or
+  the API's error code. Error codes include `max_uses_exceeded` (the
+  6-search cap), `too_many_requests` and `unavailable`. The run also shows the
+  code Claude ran to filter search results, the text Claude wrote, and a
+  failed request's error and request id.
+- **Problems are flagged** at the top of the run:
+  - a failed run, or a search that returned an error;
+  - a scoring run with no searches at all;
+  - Claude saying searching was limited, in its text or in its rationales;
+  - a fallback to another model;
+  - a `max_tokens` or `refusal` stop;
+  - Claude needing a nudge to answer.
+
+  *Problems* filters the list to those runs. *Copy* puts the shown runs on the
+  clipboard as JSON.
+- **Where it's kept:** the newest 50 runs stay on this device (`localStorage`),
+  and the trash button clears them. Each finished run is also posted to
+  `POST /api/claude-log`, which writes one JSON line (`"type":"claude-run"`) to
+  the deployment's runtime log. It's a warning when the run failed or has
+  problems. The server copy leaves out Claude's text and code, which can echo
+  your notes and amounts, but keeps the search queries. The API key is in
+  neither copy.
+
 ## Installing it (PWA)
 
 stocks-rank is an installable Progressive Web App:
@@ -313,7 +345,9 @@ hour per stock.
 
 `GET /api/stock/:symbol` returns metrics 1–7 as JSON. Claude's scores run in the
 browser and aren't part of it. `GET /api/stock/:symbol/dca` returns the latest
-close against the DCA buy rules (52-week high, drawdown, one-month change).
+close against the DCA buy rules (52-week high, drawdown, one-month change). `POST /api/claude-log` takes a
+Claude run's summary from the page and writes it to the runtime log (see
+[The Claude log](#the-claude-log)).
 
 ## Architecture
 
@@ -324,7 +358,7 @@ design system that knows nothing about stocks.
 ```
 src/app/                       routes: / · /stock/[symbol] · /stock/[symbol]/chart · /watchlist · /portfolios ·
                                /portfolios/new · /portfolios/[id] · /offline · /api/stock/[symbol] ·
-                               /api/stock/[symbol]/dca · /api/version
+                               /claude-log · /api/stock/[symbol]/dca · /api/claude-log · /api/version
 src/features/
   scoring/                     metric catalogue, thresholds and pure scoring rules (the spec lives here)
   market-data/                 fundamentals and daily-history types + pure derivations; yahoo.ts does the I/O;
@@ -351,6 +385,9 @@ src/features/
                                heuristic.ts (the no-Claude versions), all pure and tested; store.ts keeps the draft,
                                saved portfolios, Claude runs and DCA readings; components/ for the builder and
                                its steps, the plan editor, the list and a saved portfolio's page
+  claude-log/                  log.ts turns each Claude request into a small record and flags problems (pure,
+                               tested); store.ts wraps the client to record every request, keeps the last 50
+                               runs and posts a text-free summary to the server; components/ for the log page
   navigation/                  the phone tab bar and the header's watchlist and portfolios links
 src/lib/                       format.ts (numbers and money); browser-storage.ts (guarded local/session storage
                                that notifies subscribers, for useSyncExternalStore)

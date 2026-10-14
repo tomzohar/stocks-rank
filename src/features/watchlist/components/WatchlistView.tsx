@@ -140,6 +140,7 @@ function List({ entries, onAdd }: { entries: WatchlistEntry[]; onAdd: () => void
                         onSelect: () => void refreshQuotes(symbols, { force: true }),
                       },
                       { id: "portfolio", label: "Build Portfolio", icon: "pie", onSelect: buildPortfolio },
+                      { id: "claude-log", label: "Claude Log", icon: "sparkle", onSelect: () => router.push("/claude-log") },
                     ],
                   },
                   {

@@ -54,7 +54,7 @@ export function Scorecard({
 
   return (
     <div className={styles.scorecard}>
-      <AnalysisStatus analysis={analysis} onRetry={claude.retry} />
+      <AnalysisStatus analysis={analysis} symbol={subject.symbol} onRetry={claude.retry} />
 
       <div className={styles.overview}>
         <Panel eyebrow="Score shape" title="13 metrics at a glance" className={styles.radar}>
@@ -95,7 +95,7 @@ export function Scorecard({
           status={claudeState === "pending" ? "Scoring…" : claudeState === "unscored" ? "Not scored" : null}
           highlighted={highlighted}
           onHighlight={setHighlighted}
-          footer={<ClaudeTake analysis={analysis} apiKey={claude.apiKey} onRefresh={claude.refresh} />}
+          footer={<ClaudeTake analysis={analysis} symbol={subject.symbol} apiKey={claude.apiKey} onRefresh={claude.refresh} />}
         />
       </div>
     </div>

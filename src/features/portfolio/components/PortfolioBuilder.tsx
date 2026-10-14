@@ -354,7 +354,7 @@ function StepProposal({
       </header>
       {run.error && (
         <Callout tone="critical" role="alert">
-          {run.error.message}
+          {run.error.message} <Link href="/claude-log">See the run log</Link>
         </Callout>
       )}
       {needsKey ? (

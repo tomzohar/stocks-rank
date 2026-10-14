@@ -12,21 +12,21 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Read `README.md` first: it covers the metrics and their edge cases, the DCA
 rules, the watchlist, portfolios, how Claude is used (and where the API key
-may and may not go), the PWA and update flow, and the architecture.
+may and may not go), the Claude log, the PWA and update flow, and the architecture.
 
 - **Checks:** `npm run check` (lint, typecheck, unit tests) and `npm run build`
   before pushing. `npm run dev:demo` runs fully offline with labelled fake data.
 - **Boundaries:** routes in `src/app/` compose features; `src/features/<name>/`
   own their logic, components and styles; `src/ui/` stays stock-agnostic. ESLint
   enforces the import rules. Keep pure logic (scoring, `scorecard/model.ts`,
-  radar geometry, the DCA engine, the portfolio model, rules and prompts) free
+  radar geometry, the DCA engine, the portfolio model, rules and prompts, the Claude log) free
   of React and covered by tests.
 - **Styling:** CSS modules next to each component; colours only from the
   tokens in `src/styles/tokens.css`, in both themes; respect reduced motion.
   Controls follow iOS conventions: reuse `Button`, `Menu`, `Sheet`/`ActionSheet`,
   `SegmentedControl`, `TabLinks`, `SwipeActions`, `Switch`, `Stepper` and `Toast` from `src/ui/` before adding new ones.
-- **Browser state** (the API key, Claude's cache, the watchlist, average buy prices, portfolios
-  and the builder's draft) goes through
+- **Browser state** (the API key, Claude's cache, the Claude log, the watchlist, average buy
+  prices, portfolios and the builder's draft) goes through
   `src/lib/browser-storage.ts`, keys prefixed `stocks-rank:`, read with
   `useSyncExternalStore`. Anything a swipe does must also be reachable by
   keyboard or mouse.
@@ -40,7 +40,10 @@ may and may not go), the PWA and update flow, and the architecture.
   `features/analysis/`, picks and proposals in `features/portfolio/`. Load the
   SDK with a dynamic `import()` so it stays out of page bundles. Every Claude
   feature has a labelled stand-in on demo data, so `npm run dev:demo` works
-  without a key. Error messages come from `describeAnalysisError`.
+  without a key. Error messages come from `describeAnalysisError`. Run every
+  Claude call through `logClaudeRun` (`features/claude-log/store.ts`) so it
+  shows in the Claude log; the server copy (`/api/claude-log`) must never carry
+  the key or Claude's text.
 - **Prerendering:** with Cache Components, a client component that reads the
   clock (`Date.now()`, as `useWatchlistRows` does) must render only after its
   browser data has loaded, or the build fails. Gate it behind the loading state.

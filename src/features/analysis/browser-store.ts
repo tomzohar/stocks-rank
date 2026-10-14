@@ -3,6 +3,7 @@
 // through useSyncExternalStore. Nothing here is ever sent to the stocks-rank server.
 import { z } from "zod";
 import { notifyStorage, readStorage, subscribeStorage, writeStorageQuietly } from "@/lib/browser-storage";
+import { logClaudeRun } from "@/features/claude-log/store";
 import { QUALITATIVE_METRIC_IDS } from "@/features/scoring/metrics";
 import { ANALYSIS_VERSION } from "./prompt";
 import type { AnalysisSubject, QualitativeAnalysis } from "./types";
@@ -117,7 +118,9 @@ export function runAnalysis(subject: AnalysisSubject, apiKey: string): Promise<v
   const run = (async () => {
     // Loaded on demand so the SDK stays out of the initial page bundle.
     const { analyzeWithClaude, createBrowserClient } = await import("./claude");
-    const analysis = await analyzeWithClaude(subject, { client: createBrowserClient(apiKey) });
+    const analysis = await logClaudeRun({ kind: "scoring", subject: subject.symbol }, createBrowserClient(apiKey), (client) =>
+      analyzeWithClaude(subject, { client }),
+    );
     storeAnalysis(subject.symbol, analysis);
   })().finally(() => {
     inFlight.delete(subject.symbol);

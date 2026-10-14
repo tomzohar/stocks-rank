@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { ApiKeyForm } from "@/features/analysis/components/ApiKeyForm";
 import { RadarGlyph } from "@/features/radar/RadarGlyph";
@@ -258,7 +259,7 @@ function ClaudePicks({
           <>
             {run.error && (
               <Callout tone="critical" role="alert">
-                {run.error.message}
+                {run.error.message} <Link href="/claude-log">See the run log</Link>
               </Callout>
             )}
             <div className={styles.askRow}>

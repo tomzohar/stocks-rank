@@ -31,6 +31,10 @@
   font-size: 0.72rem;
   color: var(--text-muted);
 }
+.meta a {
+  color: var(--series);
+  text-decoration: none;
+}
 .cache {
   display: flex;
   flex-wrap: wrap;

@@ -5,6 +5,7 @@
 // requests for price readings; Claude is called with the viewer's own key.
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { z } from "zod";
+import { logClaudeRun } from "@/features/claude-log/store";
 import type { DcaReading } from "@/features/dca/reading";
 import {
   notifyStorage,
@@ -254,7 +255,8 @@ export function startPick(req: PickRequest, { apiKey, demo }: { apiKey: string |
         import("./claude"),
         import("@/features/analysis/claude"),
       ]);
-      return pickWithClaude(req, { client: createBrowserClient(apiKey) });
+      const subject = `${req.candidates.length} ${req.candidates.length === 1 ? "stock" : "stocks"}`;
+      return logClaudeRun({ kind: "picks", subject }, createBrowserClient(apiKey), (client) => pickWithClaude(req, { client }));
     },
     (picks) => ({ picks }),
   );
@@ -276,7 +278,9 @@ export function startProposal(
         import("./claude"),
         import("@/features/analysis/claude"),
       ]);
-      return proposeWithClaude({ ...req, readings }, { client: createBrowserClient(apiKey) });
+      return logClaudeRun({ kind: "proposal", subject: req.candidates.map((c) => c.symbol).join(", ") }, createBrowserClient(apiKey), (client) =>
+        proposeWithClaude({ ...req, readings }, { client }),
+      );
     },
     (plan) => ({ plan }),
   );

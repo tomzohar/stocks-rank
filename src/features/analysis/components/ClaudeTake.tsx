@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { forgetApiKey, keyHint } from "@/features/analysis/browser-store";
 import { hostname, isWebUrl, modelLabel, shortDate } from "@/features/analysis/display";
 import type { AnalysisState } from "@/features/analysis/types";
@@ -10,10 +11,12 @@ import styles from "./ClaudeTake.module.css";
 /** Claude's summary, who scored it and when, its sources, and the cache and key controls. */
 export function ClaudeTake({
   analysis,
+  symbol,
   apiKey,
   onRefresh,
 }: {
   analysis: AnalysisState;
+  symbol: string;
   apiKey: string | null;
   onRefresh: () => void;
 }) {
@@ -39,6 +42,12 @@ export function ClaudeTake({
         {a.source === "demo"
           ? "Demo analysis · generated offline, not real"
           : `Scored by ${modelLabel(a.model)} · ${new Date(a.analyzedAt).toLocaleDateString("en-US", { dateStyle: "medium" })}`}
+        {a.source === "claude" && (
+          <>
+            {" · "}
+            <Link href={`/claude-log?subject=${encodeURIComponent(symbol)}`}>Run log</Link>
+          </>
+        )}
       </p>
 
       {analysis.cache && (
